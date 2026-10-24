@@ -98,6 +98,10 @@ func export_files(files, output_dir, target, target_file, image_size) -> void:
 func _ready():
 	RenderingServer.set_default_clear_color(Color.BLACK)
 	var args : PackedStringArray = OS.get_cmdline_args()
+	if "--cli" in args or "--cli" in OS.get_cmdline_user_args():
+		# Scriptable command line interface / server (see material_maker/cli)
+		add_child(load("res://material_maker/cli/mm_cli.gd").new())
+		return
 	if ("--export" in args) or ("--export-material" in args):
 		print("Exporting...")
 		var image_size : int = 2048
