@@ -723,9 +723,29 @@ func op_disconnect(args : Dictionary) -> Dictionary:
 	dirty = true
 	return { ok = true }
 
+# Buffer nodes (Buffer, Iterate buffer, and the ones inside nodes such as Normal map) are computed
+# asynchronously by the dependency system. Reading them before that has finished yields empty
+# textures (e.g. a flat 0.5, 0.5, 0.0 "normal map"), so wait for them.
+func _wait_for_buffers(timeout_ms : int = 60000) -> bool:
+	var start : int = Time.get_ticks_msec()
+	mm_deps.update()
+	var settled_frames : int = 0
+	while settled_frames < 3:
+		await get_tree().process_frame
+		var busy : bool = mm_deps.updating or mm_deps.update_scheduled
+		for b in mm_deps.buffers.values():
+			if (b.object is MMGenBuffer or b.object is MMGenIterateBuffer) and b.status in [mm_deps.Buffer.Invalidated, mm_deps.Buffer.Updating, mm_deps.Buffer.UpdatingInvalidated]:
+				busy = true
+				break
+		settled_frames = 0 if busy else settled_frames + 1
+		if Time.get_ticks_msec() - start > timeout_ms:
+			return false
+	return true
+
 func op_render(args : Dictionary) -> Dictionary:
 	if not _has_project():
 		return _err("No project is open")
+	var buffers_ready : bool = await _wait_for_buffers()
 	var gen : MMGenBase = _node_at(str(args.get("node", "Material" if _has_project() and root.has_node("Material") else "")))
 	if gen == null:
 		return _err("Node '%s' not found" % str(args.get("node", "")))
@@ -757,6 +777,8 @@ func op_render(args : Dictionary) -> Dictionary:
 	if image == null or image.is_empty():
 		return _err("Rendering failed (shader error? check the log)")
 	var rv : Dictionary = { node = gen.name, output = output_index, width = image.get_width(), height = image.get_height(), render_ms = Time.get_ticks_msec() - started }
+	if not buffers_ready:
+		rv.warning = "Timed out waiting for buffer nodes to finish; the image may be incomplete"
 	rv.merge(_image_stats(image))
 	var out : String = abs_path(str(args.get("out", "")))
 	if out != "":
