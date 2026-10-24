@@ -89,6 +89,14 @@ TOOLS = {
          "output": dict(description="Output port index/name, or material channel for the Material node (default 0)", type=["integer", "string"]),
          "size": I("Image size in pixels (default 256, max 8192)"),
          "save_path": S("Also write the image here (.png, .jpg, .webp, .exr)")}, []),
+    "auto_layout": ("auto_layout",
+        "Arrange the nodes of the graph left to right by dependency (sources left, Material on the right). "
+        "Call it after building a graph so it is readable in the editor. Not recorded in undo history.",
+        {"graph": GRAPH}, []),
+    "screenshot_editor": ("screenshot",
+        "LIVE MODE ONLY (MM_LIVE_PORT set): capture the Material Maker editor window so you can see the node graph "
+        "and previews as the user does. Returns the image.",
+        {}, []),
     "list_export_targets": ("list_export_targets", "List the export targets available for the Material node(s).", {}, []),
     "export": ("export",
         "Export the material's textures/files for a target engine (e.g. 'Godot/Godot 4 Standard', 'Unity/Unity URP', 'Unreal/...').",
@@ -114,7 +122,9 @@ def schema(props, required):
 def get_server():
     global server
     if server is None:
-        server = Server(cwd=os.getcwd())
+        # MM_LIVE_PORT: drive the running editor (python tools/mm.py gui) instead of a headless copy
+        live_port = os.environ.get("MM_LIVE_PORT")
+        server = Server(cwd=os.getcwd(), live_port=int(live_port) if live_port else None)
     return server
 
 
@@ -179,6 +189,18 @@ def run_tool(name, arguments):
     args = dict(arguments or {})
     if name == "render":
         return run_render(args)
+    if name == "screenshot_editor":
+        fd, tmp = tempfile.mkstemp(suffix=".png", prefix="mm_shot_")
+        os.close(fd)
+        try:
+            result, err = call_mm("screenshot", {"out": tmp})
+            if err:
+                return tool_result(err, True)
+            with open(tmp, "rb") as f:
+                return tool_result("Editor window %sx%s" % (result.get("width"), result.get("height")), False,
+                                   base64.b64encode(f.read()).decode("ascii"))
+        finally:
+            os.remove(tmp)
     result, err = call_mm(TOOLS[name][0], args)
     if err:
         return tool_result(err, True)

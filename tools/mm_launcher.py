@@ -61,6 +61,22 @@ def _env(cwd):
     return env
 
 
+def start_gui(port=8765, files=()):
+    """Launch the editor with the live server enabled. Returns the Popen (the editor keeps running)."""
+    argv = command_prefix()
+    exe = os.environ.get("MM_EXE")
+    if exe:
+        argv = [exe]
+    else:
+        # the full GUI: no --no-window; use the windowed exe, not the console one
+        argv = [a for a in argv if a != "--no-window"]
+        if sys.platform == "win32":
+            argv[0] = argv[0].replace("_console.exe", ".exe")
+        argv = [a for a in argv if a != "--"]
+    argv = argv + ["--"] + ["--live-server", str(port)] + [os.path.abspath(f) for f in files]
+    return subprocess.Popen(argv, env=_env(None), cwd=REPO if not exe else None)
+
+
 def run_cli(args, cwd=None, timeout=600):
     """Run one `--cli` command. Returns (result_dict, log_text)."""
     argv = command_prefix() + ["--cli"] + list(args)
@@ -90,8 +106,9 @@ def interesting_log(log, limit=40):
 class Server:
     """A long-running `--cli serve` process spoken to with JSON lines over localhost TCP."""
 
-    def __init__(self, cwd=None, startup_timeout=120):
+    def __init__(self, cwd=None, startup_timeout=120, live_port=None):
         self.cwd = cwd
+        self.live_port = live_port  # attach to a running editor (--live-server) instead of starting one
         self.startup_timeout = startup_timeout
         self.proc = None
         self.sock = None
@@ -113,6 +130,15 @@ class Server:
                 ready.set()
 
     def start(self):
+        if self.live_port:
+            try:
+                self.sock = socket.create_connection(("127.0.0.1", self.live_port), timeout=5)
+            except OSError:
+                raise LauncherError("No live Material Maker on port %d. Start the editor with: python tools/mm.py gui --port %d"
+                                    % (self.live_port, self.live_port))
+            self.sock.settimeout(None)
+            self.buffer = b""
+            return
         port = self._free_port()
         argv = command_prefix() + ["--cli", "serve", "--port", str(port)]
         self.proc = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
@@ -131,6 +157,8 @@ class Server:
         self.sock.settimeout(None)
 
     def alive(self):
+        if self.live_port:
+            return self.sock is not None
         return self.proc is not None and self.proc.poll() is None and self.sock is not None
 
     def call(self, op, args=None, timeout=600):
@@ -138,7 +166,7 @@ class Server:
         with self.lock:
             if not self.alive():
                 self.start()
-            request = {"id": self.next_id, "op": op, "args": args or {}}
+            request = {"id": self.next_id, "op": op, "args": args or {}, "cwd": (self.cwd or os.getcwd()).replace("\\", "/")}
             self.next_id += 1
             self.sock.sendall((json.dumps(request) + "\n").encode("utf-8"))
             self.sock.settimeout(timeout)
@@ -154,6 +182,11 @@ class Server:
             return json.loads(line.decode("utf-8"))
 
     def stop(self):
+        if self.live_port:  # never shut down somebody's editor
+            if self.sock is not None:
+                self.sock.close()
+            self.sock = None
+            return
         try:
             if self.sock is not None:
                 self.sock.sendall(b'{"id":0,"op":"shutdown"}\n')

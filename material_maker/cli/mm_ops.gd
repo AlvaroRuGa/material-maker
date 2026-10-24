@@ -26,6 +26,11 @@ const BUILTIN_TYPES : Dictionary = {
 	graph = "Empty subgraph",
 }
 
+# Live mode: set to a Callable returning the MMGraphEdit of the current tab of the running
+# editor. Edits then go through the editor's own (undoable) API so the graph is redrawn as
+# it changes, instead of working on a private headless copy.
+var live : Callable = Callable()
+
 var root : MMGenGraph = null
 var path : String = ""
 var dirty : bool = false
@@ -39,12 +44,38 @@ func _err(message : String, extra : Dictionary = {}) -> Dictionary:
 
 # Helpers -----------------------------------------------------------------------
 
+func is_live() -> bool:
+	return live.is_valid()
+
+func _ge():
+	return live.call() if live.is_valid() else null
+
+# In live mode the project is whatever the editor has open, so refresh before each operation
+func _sync_live() -> void:
+	var ge = _ge()
+	if ge == null or ge.top_generator == null or not is_instance_valid(ge.top_generator):
+		root = null
+		path = ""
+		dirty = false
+	else:
+		root = ge.top_generator
+		path = ge.save_path
+		dirty = ge.need_save
+
+# Edits must happen in the graph that the editor currently shows
+func _show_graph(graph : MMGenGraph) -> void:
+	var ge = _ge()
+	if ge != null and ge.generator != graph:
+		ge.update_view(graph)
+
 # Godot changes its working directory to the project when started with --path, so the
 # launcher passes the caller's directory in MM_CWD and relative paths are resolved there.
-static func abs_path(p : String) -> String:
+var cwd : String = ""   # set per request by the server (the caller's directory)
+
+func abs_path(p : String) -> String:
 	if p == "" or p.is_absolute_path() or p.begins_with("res://") or p.begins_with("user://"):
 		return p
-	var base : String = OS.get_environment("MM_CWD")
+	var base : String = cwd if cwd != "" else OS.get_environment("MM_CWD")
 	return base.path_join(p) if base != "" else p
 
 func _has_project() -> bool:
@@ -292,21 +323,35 @@ func _coerce_param(gen : MMGenBase, param : String, value) -> Dictionary:
 			return { value = str(value) }
 	return { value = MMType.deserialize_value(value) }
 
-func _apply_params(gen : MMGenBase, params : Dictionary) -> Dictionary:
-	var applied : Dictionary = {}
+func _coerce_params(gen : MMGenBase, params : Dictionary) -> Dictionary:
+	var values : Dictionary = {}
 	for p in params.keys():
 		var r : Dictionary = _coerce_param(gen, p, params[p])
 		if r.has("error"):
 			return r
-		gen.set_parameter(p, r.value)
-		applied[p] = jsonable(r.value)
+		values[p] = r.value
+	return { values = values }
+
+func _apply_params(gen : MMGenBase, params : Dictionary) -> Dictionary:
+	var coerced : Dictionary = _coerce_params(gen, params)
+	if coerced.has("error"):
+		return coerced
+	var applied : Dictionary = {}
+	var serialized : Dictionary = {}
+	for p in coerced.values.keys():
+		applied[p] = jsonable(coerced.values[p])
+		serialized[p] = MMType.serialize_value(coerced.values[p])
+		if not is_live():
+			gen.set_parameter(p, coerced.values[p])
+	if is_live() and not serialized.is_empty():
+		_ge().set_node_parameters(gen, serialized)   # undoable, updates the node widgets
 	return { applied = applied }
 
 
 # Operations -------------------------------------------------------------------------
 
 func op_ping(_args : Dictionary) -> Dictionary:
-	return { pong = true, godot = Engine.get_version_info().string, material_maker = ProjectSettings.get_setting("application/config/release", "") }
+	return { pong = true, live = is_live(), godot = Engine.get_version_info().string, material_maker = ProjectSettings.get_setting("application/config/release", "") }
 
 func op_list_node_types(args : Dictionary) -> Dictionary:
 	var filter : String = str(args.get("filter", "")).to_lower()
@@ -360,6 +405,15 @@ func op_node_type_info(args : Dictionary) -> Dictionary:
 
 func op_new_project(args : Dictionary) -> Dictionary:
 	var size_exp : int = int(args.get("size", 11))
+	if is_live():
+		await mm_globals.main_window.new_material()
+		_sync_live()
+		if not _has_project():
+			return _err("The editor could not create a project")
+		var material : Node = root.get_node_or_null("Material")
+		if material != null:
+			material.set_parameter("size", size_exp)
+		return { ok = true, nodes = root.get_children().size() }
 	var gen = await mm_loader.create_gen({ nodes = [{ name = "Material", type = "material", parameters = { size = size_exp } }], connections = [] })
 	if gen == null:
 		return _err("Cannot create project")
@@ -372,6 +426,11 @@ func op_open(args : Dictionary) -> Dictionary:
 	var file : String = abs_path(str(args.get("path", "")))
 	if file == "" or not FileAccess.file_exists(file):
 		return _err("File not found: '%s'" % file)
+	if is_live():
+		if not await mm_globals.main_window.do_load_project(file):
+			return _err("The editor could not load '%s'" % file)
+		_sync_live()
+		return { ok = true, path = path, nodes = root.get_children().filter(func(c): return c is MMGenBase).size() if _has_project() else 0 }
 	var gen = await mm_loader.load_gen(file)
 	if gen == null:
 		return _err("Cannot load '%s'" % file)
@@ -390,12 +449,18 @@ func op_save(args : Dictionary) -> Dictionary:
 		file += ".ptex"
 	if file.get_base_dir() != "":
 		DirAccess.make_dir_recursive_absolute(file.get_base_dir())
-	mm_loader.save_gen(file, root)
+	if is_live():
+		if not await _ge().save_file(file):
+			return _err("The editor could not save '%s'" % file)
+	else:
+		mm_loader.save_gen(file, root)
 	path = file
 	dirty = false
 	return { ok = true, path = file }
 
 func op_close(_args : Dictionary) -> Dictionary:
+	if is_live():
+		return _err("close is not available in live mode (close the tab in the editor)")
 	_close()
 	return { ok = true }
 
@@ -431,6 +496,8 @@ func op_add_node(args : Dictionary) -> Dictionary:
 	if not (mm_loader.predefined_generators.has(type) or BUILTIN_TYPES.has(type)):
 		var close : Array = mm_loader.predefined_generators.keys().filter(func(k): return type != "" and (type in k or k in type))
 		return _err("Unknown node type '%s'" % type, { suggestions = close.slice(0, 10) })
+	if is_live():
+		return await _live_add_node(graph, type, args)
 	var gen : MMGenBase = await _make_gen(type)
 	if gen == null:
 		return _err("Cannot instantiate node type '%s'" % type)
@@ -444,8 +511,7 @@ func op_add_node(args : Dictionary) -> Dictionary:
 	if args.has("position"):
 		gen.position = Vector2(args.position[0], args.position[1])
 	else:
-		var count : int = graph.get_children().filter(func(c): return c is MMGenBase).size()
-		gen.position = Vector2(300 * (count % 6), 250 * (count / 6))
+		gen.position = _next_position(graph)
 	if not graph.add_generator(gen):
 		gen.free()
 		return _err("Cannot add node '%s' here" % type)
@@ -457,12 +523,120 @@ func op_add_node(args : Dictionary) -> Dictionary:
 	dirty = true
 	return _node_summary(gen, false, true)
 
+# New nodes go to the left of everything else (the Material sink sits on the right), in the order
+# they are added, so a chain built from generator to material reads left to right.
+func _next_position(graph : MMGenGraph) -> Vector2:
+	var min_x : float = 0.0
+	var found : bool = false
+	for c in graph.get_children():
+		if c is MMGenBase:
+			min_x = min(min_x, c.position.x) if found else c.position.x
+			found = true
+	return Vector2(min_x - 330.0 if found else 0.0, 0.0)
+
+func op_auto_layout(args : Dictionary) -> Dictionary:
+	var graph : MMGenGraph = _graph_at(str(args.get("graph", "")))
+	if graph == null:
+		return _err("Graph '%s' not found" % str(args.get("graph", "")))
+	var gens : Array = graph.get_children().filter(func(c): return c is MMGenBase)
+	var outgoing : Dictionary = {}
+	for c in graph.connections:
+		if not outgoing.has(c.from):
+			outgoing[c.from] = []
+		outgoing[c.from].append(c.to)
+	# depth = longest path to a node that feeds nothing (relaxation, so loops cannot hang it)
+	var depth : Dictionary = {}
+	for g in gens:
+		depth[str(g.name)] = 0
+	for _i in gens.size():
+		var changed : bool = false
+		for from in outgoing.keys():
+			for t in outgoing[from]:
+				if depth.has(str(from)) and depth.has(str(t)) and depth[str(from)] < depth[str(t)] + 1 and depth[str(t)] < gens.size():
+					depth[str(from)] = depth[str(t)] + 1
+					changed = true
+		if not changed:
+			break
+	var layers : Dictionary = {}
+	for g in gens:
+		var d : int = depth[str(g.name)]
+		if not layers.has(d):
+			layers[d] = []
+		layers[d].append(g)
+	for d in layers.keys():
+		var y : float = 0.0
+		for g in layers[d]:
+			var h : float = 220.0 + 30.0 * max(g.get_parameter_defs().size(), g.get_input_defs().size())
+			g.position = Vector2(-380.0 * d, y)
+			y += h
+	if is_live():
+		_ge().update_view(graph)
+		_ge().center_view()
+	dirty = true
+	return { ok = true, layers = layers.size() }
+
+func op_quit_editor(_args : Dictionary) -> Dictionary:
+	if not is_live():
+		return _err("quit_editor is only available in live mode")
+	# Deferred so the reply is sent first. A normal exit also deletes the crash-recovery file;
+	# force-killing the editor leaves it behind and the next start asks to "load unsaved work".
+	get_tree().create_timer(0.3).timeout.connect(func(): get_tree().quit())
+	return { ok = true }
+
+func op_center_view(_args : Dictionary) -> Dictionary:
+	if not is_live():
+		return _err("center_view is only available in live mode")
+	_ge().center_view()
+	return { ok = true }
+
+func _live_add_node(graph : MMGenGraph, type : String, args : Dictionary) -> Dictionary:
+	# Validate and convert the parameters on a throw-away instance first, so that a bad
+	# request leaves the editor (and its undo history) untouched.
+	var temp : MMGenBase = await _make_gen(type)
+	if temp == null:
+		return _err("Cannot instantiate node type '%s'" % type)
+	var serialized : Dictionary = {}
+	if args.has("parameters"):
+		var coerced : Dictionary = _coerce_params(temp, args.parameters)
+		if coerced.has("error"):
+			temp.free()
+			return coerced
+		for p in coerced.values.keys():
+			serialized[p] = MMType.serialize_value(coerced.values[p])
+	temp.free()
+	var node_name : String = str(args.get("name", ""))
+	if node_name == "":
+		node_name = _free_name(graph, type)
+	elif graph.has_node(NodePath(node_name)):
+		return _err("A node named '%s' already exists" % node_name)
+	var pos : Vector2
+	if args.has("position"):
+		pos = Vector2(args.position[0], args.position[1])
+	else:
+		pos = _next_position(graph)
+	var node_data : Dictionary = { type = type } if type != "graph" else { nodes = [], connections = [] }
+	node_data.name = node_name
+	node_data.node_position = { x = pos.x, y = pos.y }
+	if not serialized.is_empty():
+		node_data.parameters = serialized
+	_show_graph(graph)
+	var nodes : Array = await _ge().create_nodes({ nodes = [node_data], connections = [] })
+	if nodes.is_empty():
+		return _err("The editor refused to add node '%s'" % type)
+	return _node_summary(nodes[0].generator, false, true)
+
 func op_remove_node(args : Dictionary) -> Dictionary:
 	var gen : MMGenBase = _node_at(str(args.get("node", "")))
 	if gen == null or gen == root:
 		return _err("Node '%s' not found" % str(args.get("node", "")))
 	var parent : Node = gen.get_parent()
-	if not (parent is MMGenGraph) or not parent.remove_generator(gen):
+	if is_live():
+		_show_graph(parent)
+		var ui : Node = _ge().get_node_or_null("node_" + gen.name)
+		if ui == null or not gen.can_be_deleted():
+			return _err("Node '%s' cannot be removed" % gen.name)
+		_ge().remove_node(ui)
+	elif not (parent is MMGenGraph) or not parent.remove_generator(gen):
 		return _err("Node '%s' cannot be removed" % gen.name)
 	dirty = true
 	return { ok = true }
@@ -495,6 +669,8 @@ func op_rename_node(args : Dictionary) -> Dictionary:
 		if c.to == old_name:
 			c.to = new_name
 	gen.name = new_name
+	if is_live():
+		_ge().update_view(parent)   # rebuild the node widgets: they are named after the generators
 	dirty = true
 	return { ok = true, name = gen.name }
 
@@ -514,7 +690,13 @@ func op_connect(args : Dictionary) -> Dictionary:
 		return _err("Invalid output port '%s' on '%s'" % [str(args.get("from_port", 0)), from.name], { outputs = _port_summary(from.get_output_defs()) })
 	if to_port < 0 or to_port >= to.get_input_defs().size():
 		return _err("Invalid input port '%s' on '%s'" % [str(args.get("to_port", 0)), to.name], { inputs = _port_summary(to.get_input_defs()) })
-	if not graph.connect_children(from, from_port, to, to_port):
+	if is_live():
+		_show_graph(graph)
+		_ge().on_connect_node("node_" + from.name, from_port, "node_" + to.name, to_port)
+		var made : bool = graph.connections.any(func(c): return c.from == from.name and c.from_port == from_port and c.to == to.name and c.to_port == to_port)
+		if not made:
+			return _err("Connection refused (would create a loop?)")
+	elif not graph.connect_children(from, from_port, to, to_port):
 		return _err("Connection refused (would create a loop?)")
 	dirty = true
 	return { ok = true, connection = "%s:%d -> %s:%d" % [from.name, from_port, to.name, to_port] }
@@ -530,7 +712,11 @@ func op_disconnect(args : Dictionary) -> Dictionary:
 	var found : bool = false
 	for c in graph.connections.duplicate():
 		if c.to == to.name and c.to_port == to_port:
-			graph.disconnect_children_by_name(c.from, c.from_port, c.to, c.to_port)
+			if is_live():
+				_show_graph(graph)
+				_ge().on_disconnect_node("node_" + c.from, c.from_port, "node_" + c.to, c.to_port)
+			else:
+				graph.disconnect_children_by_name(c.from, c.from_port, c.to, c.to_port)
 			found = true
 	if not found:
 		return _err("Nothing is connected to '%s' input %d" % [to.name, to_port])
@@ -652,6 +838,19 @@ func op_export(args : Dictionary) -> Dictionary:
 		return _err("Project has no exportable material node")
 	return { ok = true, exported = exported }
 
+func op_screenshot(args : Dictionary) -> Dictionary:
+	if not is_live():
+		return _err("screenshot is only available in live mode (the editor window)")
+	var image : Image = get_viewport().get_texture().get_image()
+	var out : String = abs_path(str(args.get("out", "")))
+	if out == "":
+		return _err("'out' (a .png path) is required")
+	if out.get_base_dir() != "":
+		DirAccess.make_dir_recursive_absolute(out.get_base_dir())
+	if image.save_png(out) != OK:
+		return _err("Cannot write '%s'" % out)
+	return { ok = true, path = out, width = image.get_width(), height = image.get_height() }
+
 func op_batch(args : Dictionary) -> Dictionary:
 	var results : Array = []
 	for item in args.get("ops", []):
@@ -668,11 +867,13 @@ func call_op(op : String, args : Dictionary) -> Dictionary:
 	var method : String = "op_" + op.replace("-", "_")
 	if not has_method(method):
 		return _err("Unknown operation '%s'" % op, { operations = OPERATIONS })
+	if is_live():
+		_sync_live()
 	var rv = await call(method, args)
 	return rv if rv is Dictionary else { result = rv }
 
 const OPERATIONS : Array = [
 	"ping", "list_node_types", "node_type_info", "new_project", "open", "save", "close", "describe", "get_node",
 	"add_node", "remove_node", "rename_node", "set_parameter", "set_parameters", "connect", "disconnect",
-	"render", "list_export_targets", "export", "batch",
+	"render", "list_export_targets", "export", "screenshot", "auto_layout", "center_view", "quit_editor", "batch",
 ]

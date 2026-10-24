@@ -8,6 +8,7 @@ This fork adds a scriptable, headless interface to Material Maker:
 | `material_maker/cli/mm_cli.gd` | The `--cli <command>` entry point (hooked into `parse_args.gd`) |
 | `material_maker/cli/mm_server.gd` | `--cli serve`: newline-delimited JSON over localhost TCP, keeps a project open between calls |
 | `tools/mm.py` | Convenience launcher for the CLI (finds Godot, hides engine log noise, pretty-prints JSON) |
+| `material_maker/cli/mm_live.gd` | Starts that server inside the running editor (`--live-server`), see "Live mode" |
 | `tools/mm_mcp.py` | MCP server (stdio, no dependencies) so an AI agent can build graphs and *look at the renders* |
 
 The old `--export` command line (`parse_args.gd`) is unchanged.
@@ -89,10 +90,37 @@ Tools: `list_node_types`, `node_type_info`, `new_project`, `open_project`, `save
 One Material Maker process is started on first use and keeps the project open between calls; call
 `save_project` to persist it.
 
+## Live mode: watch the editor while an agent edits
+
+Headless mode works on its own private copy of the project. Live mode runs the same operations inside the
+real editor, acting on the project in the current tab: nodes appear as they are added, widgets update,
+the previews refresh, and every edit goes into the undo history (Ctrl+Z works).
+
+```sh
+python tools/mm.py gui                                  # opens the editor with the live server on 127.0.0.1:8765
+python tools/mm.py live describe                        # any operation: live <op> ['{"json": "args"}']
+python tools/mm.py live add_node '{"type":"bricks","name":"Bricks"}'
+python tools/mm.py live connect '{"from":"Bricks","to":"Material","to_port":"albedo"}'
+python tools/mm.py live auto_layout                     # arrange left to right and center the view
+python tools/mm.py live screenshot '{"out":"editor.png"}'   # what the editor window looks like
+python tools/mm.py live quit_editor                     # clean exit (a force-kill leaves a crash-recovery file)
+```
+
+Without the wrapper: `MaterialMaker --live-server 8765` or `godot --path <repo> -- --live-server 8765`
+(or set `MM_LIVE_PORT`). For the MCP server, set `MM_LIVE_PORT=8765` in its environment and it attaches to
+the running editor instead of starting a headless one; the `screenshot_editor` tool is then available.
+
+Differences from headless mode:
+* the project is whatever the current tab holds; `new_project` / `open` open a new tab / load into the
+  editor, `save` saves it like File > Save. `close` is not available (close the tab yourself);
+* edits are made in the graph the editor currently shows (it switches to a subgraph when you target one);
+* `rename_node` and `auto_layout` rebuild the view and are not in the undo history;
+* the server only listens on localhost and executes whatever operations it receives, including writing files.
+
 ## Not covered (yet)
 
-Painting projects, the 3D preview / lit rendering of the finished material, brushes, and driving a running
-GUI instance. Rendering is per node output (and per Material channel).
+Painting projects, a lit render of the finished material outside the editor, and brushes. Headless rendering
+is per node output (and per Material channel).
 
 ## Tests
 

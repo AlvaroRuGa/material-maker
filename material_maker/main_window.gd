@@ -258,6 +258,9 @@ func _ready() -> void:
 	size = get_viewport().size/get_viewport().content_scale_factor
 	position = Vector2i(0, 0)
 
+	# Scriptable live mode (--live-server [port]), see material_maker/cli/mm_live.gd
+	load("res://material_maker/cli/mm_live.gd").start_if_requested(self)
+
 
 var menu_update_requested : bool = false
 

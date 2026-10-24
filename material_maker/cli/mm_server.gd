@@ -67,6 +67,7 @@ func _handle(peer : StreamPeerTCP, line : String) -> void:
 		_server.stop()
 		stopped.emit()
 		return
+	ops.cwd = str(request.get("cwd", ""))
 	var result : Dictionary = await ops.call_op(op, request.get("args", {}))
 	if result.has("error"):
 		var message : String = str(result.error)
