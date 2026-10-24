@@ -15,9 +15,10 @@ import json
 import os
 import sys
 import tempfile
+import time
 import traceback
 
-from mm_launcher import LauncherError, Server, interesting_log
+from mm_launcher import DEFAULT_LIVE_PORT, LauncherError, Server, interesting_log, live_port_in_use, start_gui
 
 PROTOCOL_VERSION = "2024-11-05"
 SERVER_INFO = {"name": "material-maker", "version": "0.1.0"}
@@ -31,6 +32,14 @@ GRAPH = S("Path of a subgraph node inside the project (e.g. 'MySubgraph'); defau
 
 # name -> (operation, description, properties, required)
 TOOLS = {
+    "editor_status": ("ping",
+        "Tell whether you are connected to the user's open Material Maker editor (live: edits appear on their screen, "
+        "undoable) or to a private headless copy. Re-checks for an open editor.",
+        {}, []),
+    "open_editor": ("ping",
+        "Start the Material Maker editor (needs MM_GODOT or MM_EXE) and attach to it, so the user can watch edits live. "
+        "Does nothing if an editor is already open. A headless project that is open is lost.",
+        {"files": dict(type="array", items=S("Project to open on start"), description=".ptex files to open")}, []),
     "list_node_types": ("list_node_types",
         "List the node types that can be added to a graph (name, label, short description). Use `filter` "
         "to search by words, e.g. 'noise', 'blur', 'brick'.",
@@ -94,7 +103,7 @@ TOOLS = {
         "Call it after building a graph so it is readable in the editor. Not recorded in undo history.",
         {"graph": GRAPH}, []),
     "screenshot_editor": ("screenshot",
-        "LIVE MODE ONLY (MM_LIVE_PORT set): capture the Material Maker editor window so you can see the node graph "
+        "LIVE MODE ONLY (editor attached, see editor_status): capture the Material Maker editor window so you can see the node graph "
         "and previews as the user does. Returns the image.",
         {}, []),
     "list_export_targets": ("list_export_targets", "List the export targets available for the Material node(s).", {}, []),
@@ -119,23 +128,46 @@ def schema(props, required):
     return {"type": "object", "properties": props, "required": required, "additionalProperties": False}
 
 
-def get_server():
+def live_port():
+    """Port to look for an open editor on, or None if live attach is switched off (MM_LIVE_PORT=off)."""
+    env = os.environ.get("MM_LIVE_PORT", "")
+    if env.lower() in ("off", "0", "false"):
+        return None
+    return int(env) if env.isdigit() else DEFAULT_LIVE_PORT
+
+
+def get_server(refresh=False):
+    """Attach to a running Material Maker editor if there is one (it starts its own server, like the
+    Unreal/Blender editors do), otherwise run a headless instance of our own."""
     global server
+    if refresh and server is not None:
+        server.stop()
+        server = None
     if server is None:
-        # MM_LIVE_PORT: drive the running editor (python tools/mm.py gui) instead of a headless copy
-        live_port = os.environ.get("MM_LIVE_PORT")
-        server = Server(cwd=os.getcwd(), live_port=int(live_port) if live_port else None)
+        port = live_port()
+        if port and live_port_in_use(port):
+            server = Server(cwd=os.getcwd(), live_port=port)
+        else:
+            server = Server(cwd=os.getcwd())
     return server
+
+
+def reset_server():
+    global server
+    if server is not None:
+        server.stop()
+    server = None
 
 
 def call_mm(op, args):
     try:
         resp = get_server().call(op, args)
     except LauncherError as e:
+        reset_server()
         return None, str(e)
     except (OSError, ValueError) as e:
-        server.stop()
-        return None, "Lost connection to Material Maker (%s). It will be restarted on the next call; the open project was lost." % e
+        reset_server()
+        return None, "Lost connection to Material Maker (%s). The next call re-detects the editor (or starts a headless copy)." % e
     if not resp.get("ok"):
         text = resp.get("error", "error")
         if resp.get("details"):
@@ -187,6 +219,28 @@ def run_tool(name, arguments):
     if name not in TOOLS:
         return tool_result("Unknown tool '%s'" % name, True)
     args = dict(arguments or {})
+    if name == "editor_status":
+        srv = get_server(refresh=True)
+        result, err = call_mm("ping", {})
+        if err:
+            return tool_result(err, True)
+        mode = "live (connected to the open editor)" if result.get("live") else "headless (private copy, not visible to the user)"
+        return tool_result("Mode: %s" % mode)
+    if name == "open_editor":
+        port = live_port() or DEFAULT_LIVE_PORT
+        if live_port_in_use(port):
+            get_server(refresh=True)
+            return tool_result("An editor is already open; attached (live).")
+        try:
+            start_gui(port, args.get("files", []))
+        except LauncherError as e:
+            return tool_result(str(e), True)
+        for _ in range(240):  # up to ~2 minutes for the window to come up
+            time.sleep(0.5)
+            if live_port_in_use(port):
+                get_server(refresh=True)
+                return tool_result("Editor started and attached (live).")
+        return tool_result("The editor did not start listening on port %d in time." % port, True)
     if name == "render":
         return run_render(args)
     if name == "screenshot_editor":

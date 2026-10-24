@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "material-maker": {
+      "command": "python",
+      "args": ["/path/to/material-maker/tools/mm_mcp.py"],
+      "env": { "MM_GODOT": "/path/to/Godot_v4.7.2-stable_win64.exe" }
+    }
+  }
+}

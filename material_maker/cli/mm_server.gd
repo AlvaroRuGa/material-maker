@@ -56,7 +56,10 @@ func _reply(peer : StreamPeerTCP, response : Dictionary) -> void:
 func _handle(peer : StreamPeerTCP, line : String) -> void:
 	var json : JSON = JSON.new()
 	if json.parse(line) != OK or not (json.data is Dictionary):
+		# Not our protocol (for instance a web page making an HTTP request to localhost): hang up, so
+		# that no later line of the same connection can be taken for a command.
 		_reply(peer, { id = null, ok = false, error = "Request must be a JSON object on one line" })
+		peer.disconnect_from_host()
 		return
 	var request : Dictionary = json.data
 	var id = request.get("id")

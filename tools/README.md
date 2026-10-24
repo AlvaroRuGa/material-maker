@@ -92,30 +92,46 @@ One Material Maker process is started on first use and keeps the project open be
 
 ## Live mode: watch the editor while an agent edits
 
-Headless mode works on its own private copy of the project. Live mode runs the same operations inside the
-real editor, acting on the project in the current tab: nodes appear as they are added, widgets update,
-the previews refresh, and every edit goes into the undo history (Ctrl+Z works).
+Headless mode works on its own private copy of the project. In live mode the same operations run inside the
+real editor, acting on the project in the current tab: nodes appear as they are added, widgets and previews
+update, and every edit goes into the undo history (Ctrl+Z works).
+
+**There is nothing to start.** The editor opens a local server (127.0.0.1:8765) by itself, and the MCP server
+attaches to it automatically when one is open (otherwise it falls back to a headless copy). So the whole
+workflow is:
+
+1. Register the MCP server once (copy `tools/mcp.json.example` to `.mcp.json` in your project and fix the paths,
+   or add the same block to your user MCP config). `MM_GODOT` is only needed for headless mode and for the
+   `open_editor` tool; it is not needed if you open Material Maker yourself.
+2. Open Material Maker (double-click, or `godot --path <repo>`).
+3. Ask the agent to build something. Tools `editor_status` (live or headless?), `open_editor` (starts the editor
+   for you), `auto_layout`, `screenshot_editor` are available in addition to the editing tools.
+
+By hand, without MCP:
 
 ```sh
-python tools/mm.py gui                                  # opens the editor with the live server on 127.0.0.1:8765
-python tools/mm.py live describe                        # any operation: live <op> ['{"json": "args"}']
+python tools/mm.py live ping                                 # any operation: live <op> ['{"json": "args"}']
 python tools/mm.py live add_node '{"type":"bricks","name":"Bricks"}'
 python tools/mm.py live connect '{"from":"Bricks","to":"Material","to_port":"albedo"}'
-python tools/mm.py live auto_layout                     # arrange left to right and center the view
-python tools/mm.py live screenshot '{"out":"editor.png"}'   # what the editor window looks like
-python tools/mm.py live quit_editor                     # clean exit (a force-kill leaves a crash-recovery file)
+python tools/mm.py live auto_layout                          # arrange left to right and center the view
+python tools/mm.py live screenshot '{"out":"editor.png"}'    # what the editor window looks like
+python tools/mm.py live quit_editor                          # clean exit (a force-kill leaves a crash-recovery file)
+python tools/mm.py gui                                       # start the editor from the command line
 ```
 
-Without the wrapper: `MaterialMaker --live-server 8765` or `godot --path <repo> -- --live-server 8765`
-(or set `MM_LIVE_PORT`). For the MCP server, set `MM_LIVE_PORT=8765` in its environment and it attaches to
-the running editor instead of starting a headless one; the `screenshot_editor` tool is then available.
+Settings: `--live-server <port>` or `MM_LIVE_PORT=<port>` change the port; `--no-live-server` or
+`MM_LIVE_PORT=off` disable the server (and MCP auto-attach).
 
 Differences from headless mode:
 * the project is whatever the current tab holds; `new_project` / `open` open a new tab / load into the
   editor, `save` saves it like File > Save. `close` is not available (close the tab yourself);
 * edits are made in the graph the editor currently shows (it switches to a subgraph when you target one);
-* `rename_node` and `auto_layout` rebuild the view and are not in the undo history;
-* the server only listens on localhost and executes whatever operations it receives, including writing files.
+* `rename_node` and `auto_layout` rebuild the view and are not in the undo history.
+
+Security: the server accepts connections from this machine only and executes whatever operations it receives,
+including opening and writing files, so any local program can drive your editor while it is open. Connections
+that do not start with a JSON request (such as a web page making an HTTP request to localhost) are dropped.
+Disable it with `--no-live-server` if that is not acceptable.
 
 ## Not covered (yet)
 

@@ -61,7 +61,26 @@ def _env(cwd):
     return env
 
 
-def start_gui(port=8765, files=()):
+DEFAULT_LIVE_PORT = 8765
+
+
+def live_port_in_use(port=DEFAULT_LIVE_PORT):
+    """True if a Material Maker editor answers on the live port."""
+    try:
+        s = Server(live_port=port)
+        s.start()
+    except LauncherError:
+        return False
+    try:
+        resp = s.call("ping", timeout=10)
+        return bool(resp.get("ok") and resp["result"].get("live"))
+    except (OSError, ValueError, LauncherError):
+        return False
+    finally:
+        s.stop()
+
+
+def start_gui(port=DEFAULT_LIVE_PORT, files=()):
     """Launch the editor with the live server enabled. Returns the Popen (the editor keeps running)."""
     argv = command_prefix()
     exe = os.environ.get("MM_EXE")
