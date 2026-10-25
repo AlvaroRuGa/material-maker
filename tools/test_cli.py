@@ -52,6 +52,21 @@ class CliTest(unittest.TestCase):
         finally:
             server.stop()
 
+    def test_4_examples(self):
+        found = cli("examples", "wood")
+        self.assertIn("wood", [e["name"] for e in found["examples"]])
+        shown = cli("show-example", "wood")
+        self.assertEqual(shown["material_channels"]["albedo"], "colorize_2:colorize")
+        self.assertIn("error", cli("show-example", "no_such_example"))
+        project = os.path.join(self.dir, "imp.ptex")
+        self.assertTrue(cli("new", project)["ok"])
+        r = cli("import-example", project, "wood", "colorize_2", "--upstream")
+        self.assertIn("colorize_2", r["imported"])
+        self.assertEqual(r["open_inputs"], [])
+        self.assertIn("error", cli("import-example", project, "wood", "Material"))
+        self.assertIn("perlin_0:0 -> warp_0:0", cli("info", project)["connections"])
+
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

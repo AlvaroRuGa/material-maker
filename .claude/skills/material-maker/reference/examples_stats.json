@@ -1,0 +1,4476 @@
+{
+ "examples": {
+  "3d_shapes": {
+   "nodes": 8,
+   "categories": [
+    "abstract/other"
+   ],
+   "types": {
+    "transform": 1,
+    "graph": 1,
+    "colorize": 1,
+    "blend": 1,
+    "edge_detect_1": 1,
+    "box": 1,
+    "sphere": 1
+   },
+   "channels": {
+    "normal": "graph(blend(transform(sphere),box))",
+    "ao": "graph(blend(transform(sphere),box))",
+    "albedo": "colorize(edge_detect_1(graph(blend)))",
+    "depth": "graph(blend(transform(sphere),box))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal": 1,
+    "roughness": 1,
+    "size": 11,
+    "sss": 0
+   },
+   "key_nodes": [
+    {
+     "name": "transform",
+     "type": "transform",
+     "parameters": {
+      "repeat": true,
+      "rotate": 0,
+      "scale_x": 0.5,
+      "scale_y": 0.5,
+      "translate_x": 0.25,
+      "translate_y": 0.25
+     }
+    },
+    {
+     "name": "edge_detect_1",
+     "type": "edge_detect_1",
+     "parameters": {
+      "size": 9
+     }
+    },
+    {
+     "name": "box",
+     "type": "box",
+     "parameters": {
+      "cx": 0.5,
+      "cy": 0.5,
+      "cz": 0.5,
+      "rx": 40,
+      "ry": 40,
+      "rz": 90,
+      "sx": 0.25,
+      "sy": 0.25,
+      "sz": 0.25
+     }
+    },
+    {
+     "name": "sphere",
+     "type": "sphere",
+     "parameters": {
+      "cx": 0.5,
+      "cy": 0.5,
+      "r": 0.5
+     }
+    }
+   ]
+  },
+  "beehive": {
+   "nodes": 10,
+   "categories": [
+    "abstract/other"
+   ],
+   "types": {
+    "colorize": 5,
+    "blend": 1,
+    "normal_map": 1,
+    "uniform_greyscale": 1,
+    "beehive": 1
+   },
+   "channels": {
+    "albedo": "colorize(blend(colorize(beehive)\u00d72))",
+    "metallic": "uniform_greyscale",
+    "roughness": "colorize(blend(colorize(beehive)\u00d72))",
+    "normal": "normal_map(blend(colorize(beehive)\u00d72))",
+    "depth": "colorize(blend(colorize(beehive)\u00d72))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao": 1,
+    "depth_scale": 0.2,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal": 1,
+    "roughness": 1,
+    "size": 11,
+    "sss": 0
+   },
+   "key_nodes": [
+    {
+     "name": "beehive_2",
+     "type": "beehive",
+     "parameters": {
+      "sx": 20,
+      "sy": 12
+     }
+    }
+   ]
+  },
+  "biohazard": {
+   "nodes": 25,
+   "categories": [
+    "abstract/other"
+   ],
+   "types": {
+    "transform": 6,
+    "pattern": 2,
+    "colorize": 5,
+    "blend": 8,
+    "combine": 1,
+    "uniform": 1,
+    "normal_map": 1
+   },
+   "channels": {
+    "normal": "normal_map(blend(blend(transform,blend),blend(colorize,blend)))",
+    "albedo": "combine(colorize(blend(blend\u00d72)))",
+    "metallic": "uniform",
+    "roughness": "colorize(blend(blend(transform,blend),blend(colorize,blend)))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao_light_affect": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal_scale": 1,
+    "resolution": 1,
+    "roughness": 1,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "transform_3",
+     "type": "transform",
+     "parameters": {
+      "repeat": false,
+      "rotate": 240,
+      "scale_x": 1,
+      "scale_y": 1,
+      "translate_x": 0,
+      "translate_y": 0
+     }
+    },
+    {
+     "name": "pattern_0",
+     "type": "pattern",
+     "parameters": {
+      "mix": 0,
+      "x_scale": 1,
+      "x_wave": 0,
+      "y_scale": 1,
+      "y_wave": 0
+     }
+    },
+    {
+     "name": "pattern_1",
+     "type": "pattern",
+     "parameters": {
+      "mix": 0,
+      "x_scale": 1,
+      "x_wave": 2,
+      "y_scale": 1,
+      "y_wave": 2
+     }
+    },
+    {
+     "name": "transform_4",
+     "type": "transform",
+     "parameters": {
+      "repeat": false,
+      "rotate": 0,
+      "scale_x": 0.05,
+      "scale_y": 2,
+      "translate_x": -0.015,
+      "translate_y": -0.15
+     }
+    },
+    {
+     "name": "transform_1",
+     "type": "transform",
+     "parameters": {
+      "repeat": false,
+      "rotate": 0,
+      "scale_x": 1,
+      "scale_y": 1,
+      "translate_x": 0,
+      "translate_y": -0.25
+     }
+    },
+    {
+     "name": "transform_0",
+     "type": "transform",
+     "parameters": {
+      "repeat": false,
+      "rotate": 0,
+      "scale_x": 1,
+      "scale_y": 1,
+      "translate_x": 0,
+      "translate_y": -0.22
+     }
+    },
+    {
+     "name": "transform_2",
+     "type": "transform",
+     "parameters": {
+      "repeat": false,
+      "rotate": 120,
+      "scale_x": 1,
+      "scale_y": 1,
+      "translate_x": 0,
+      "translate_y": 0
+     }
+    },
+    {
+     "name": "transform_6",
+     "type": "transform",
+     "parameters": {
+      "repeat": false,
+      "rotate": 0,
+      "scale_x": 0.2,
+      "scale_y": 0.2,
+      "translate_x": 0,
+      "translate_y": 0
+     }
+    },
+    {
+     "name": "combine_0",
+     "type": "combine",
+     "parameters": {
+      "color": "#ffffff",
+      "name": 0
+     }
+    }
+   ]
+  },
+  "brick_rotated": {
+   "nodes": 8,
+   "categories": [
+    "brick"
+   ],
+   "types": {
+    "blend": 1,
+    "pattern": 1,
+    "colorize": 1,
+    "transform": 1,
+    "normal_map": 1,
+    "bricks": 1
+   },
+   "channels": {
+    "depth": "colorize(blend(transform(pattern,bricks\u00d73),bricks))",
+    "normal": "normal_map(blend(transform(pattern,bricks\u00d73),bricks))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal": 1,
+    "roughness": 1,
+    "size": 11,
+    "sss": 0
+   },
+   "key_nodes": [
+    {
+     "name": "pattern",
+     "type": "pattern",
+     "parameters": {
+      "mix": 0,
+      "x_scale": 1,
+      "x_wave": 3,
+      "y_scale": 0,
+      "y_wave": 4
+     }
+    },
+    {
+     "name": "transform",
+     "type": "transform",
+     "parameters": {
+      "repeat": false,
+      "rotate": 360,
+      "scale_x": 1,
+      "scale_y": 1,
+      "translate_x": 0.5,
+      "translate_y": 0.5
+     }
+    },
+    {
+     "name": "bricks_2",
+     "type": "bricks",
+     "parameters": {
+      "bevel": 0.1,
+      "columns": 3,
+      "corner": 0,
+      "mortar": 0.1,
+      "pattern": 0,
+      "repeat": 1,
+      "round": 0,
+      "row_offset": 0.5,
+      "rows": 6
+     }
+    }
+   ]
+  },
+  "bricks": {
+   "nodes": 17,
+   "categories": [
+    "brick"
+   ],
+   "types": {
+    "colorize": 6,
+    "blend": 3,
+    "uniform": 1,
+    "perlin": 1,
+    "warp": 1,
+    "adjust_hsv": 1,
+    "remote": 1,
+    "graph": 1,
+    "normal_map": 1
+   },
+   "channels": {
+    "albedo": "blend(adjust_hsv(colorize(blend)),colorize(perlin),colorize(warp(graph,perlin)))",
+    "roughness": "colorize(colorize(warp(graph,perlin)))",
+    "metallic": "uniform",
+    "ao": "colorize(blend(warp(graph,perlin),perlin))",
+    "depth": "colorize(blend(warp(graph,perlin),perlin))",
+    "normal": "normal_map(blend(warp(graph,perlin),perlin))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao": 1,
+    "depth_scale": 0,
+    "emission_energy": 1,
+    "flags_transparent": false,
+    "metallic": 1,
+    "normal": 1,
+    "roughness": 1,
+    "size": 11,
+    "sss": 0
+   },
+   "key_nodes": [
+    {
+     "name": "Perlin",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 6,
+      "persistence": 0.85,
+      "scale_x": 4,
+      "scale_y": 4
+     }
+    },
+    {
+     "name": "Warp",
+     "type": "warp",
+     "parameters": {
+      "amount": 0.04,
+      "eps": 0.045,
+      "mode": 0
+     }
+    },
+    {
+     "name": "adjust_hsv_0",
+     "type": "adjust_hsv",
+     "parameters": {
+      "hue": 0,
+      "saturation": 1,
+      "value": 1
+     }
+    },
+    {
+     "name": "_2_2",
+     "type": "remote",
+     "parameters": {
+      "param1": 0,
+      "param2": 1,
+      "param3": 1
+     }
+    }
+   ]
+  },
+  "clump_of_grass": {
+   "nodes": 9,
+   "categories": [
+    "organic"
+   ],
+   "types": {
+    "perlin": 1,
+    "pattern": 2,
+    "blend": 1,
+    "colorize": 2,
+    "transform": 1,
+    "normal_map": 1
+   },
+   "channels": {
+    "albedo": "colorize(transform(blend(pattern,perlin),colorize(pattern)))",
+    "normal": "normal_map(transform(blend(pattern,perlin),colorize(pattern)))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao_light_affect": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 0,
+    "normal_scale": 1,
+    "resolution": 1,
+    "roughness": 1,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "perlin_0",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 4,
+      "persistence": 1,
+      "scale_x": 32,
+      "scale_y": 4
+     }
+    },
+    {
+     "name": "pattern_0",
+     "type": "pattern",
+     "parameters": {
+      "mix": 0,
+      "x_scale": 1,
+      "x_wave": 0,
+      "y_scale": 1,
+      "y_wave": 3
+     }
+    },
+    {
+     "name": "pattern_1",
+     "type": "pattern",
+     "parameters": {
+      "mix": 0,
+      "x_scale": 4,
+      "x_wave": 4,
+      "y_scale": 1,
+      "y_wave": 3
+     }
+    },
+    {
+     "name": "transform_0",
+     "type": "transform",
+     "parameters": {
+      "repeat": false,
+      "rotate": 0,
+      "scale_x": 1.6,
+      "scale_y": 1,
+      "translate_x": 0,
+      "translate_y": 0
+     }
+    }
+   ]
+  },
+  "crocodile_skin": {
+   "nodes": 7,
+   "categories": [
+    "organic"
+   ],
+   "types": {
+    "colorize": 3,
+    "uniform": 1,
+    "voronoi": 1,
+    "normal_map": 1
+   },
+   "channels": {
+    "normal": "normal_map(colorize(voronoi))",
+    "albedo": "colorize(voronoi)",
+    "roughness": "colorize(voronoi)",
+    "metallic": "uniform"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao_light_affect": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal_scale": 1,
+    "resolution": 1,
+    "roughness": 1,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "voronoi_0",
+     "type": "voronoi",
+     "parameters": {
+      "intensity": 0.4,
+      "randomness": 1,
+      "scale_x": 16,
+      "scale_y": 16,
+      "stretch_x": 1,
+      "stretch_y": 1
+     }
+    }
+   ]
+  },
+  "doc_tools": {
+   "nodes": 42,
+   "categories": [
+    "abstract/other"
+   ],
+   "types": {
+    "shader": 4,
+    "graph": 3,
+    "sdf3d_extrusion": 1,
+    "sdf3d_cylinder": 1,
+    "shape": 6,
+    "tex3d_pattern": 1,
+    "tex3d_fbm": 1,
+    "sdf3d_elongation": 1,
+    "sdf3d_torus": 1,
+    "fbm": 1,
+    "splatter": 2,
+    "colorize": 5,
+    "tile2x2": 1,
+    "splatter_color": 1,
+    "tiler_color": 1,
+    "fill_to_random_grey": 1,
+    "fill_to_random_color": 1,
+    "fill_to_uv": 1,
+    "fill_to_position": 1,
+    "fill_to_size": 1,
+    "image": 1,
+    "colormap": 1,
+    "fbm2": 1,
+    "perlin_color": 2,
+    "morphology2": 1
+   },
+   "channels": {
+    "albedo": "tiler_color(tile2x2(colorize(shape)\u00d74))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "flags_transparent": true,
+    "metallic": 1,
+    "normal": 1,
+    "roughness": 1,
+    "size": 8,
+    "sss": 0
+   },
+   "key_nodes": [
+    {
+     "name": "raymarching",
+     "type": "shader",
+     "parameters": {}
+    },
+    {
+     "name": "sdf3d_extrusion",
+     "type": "sdf3d_extrusion",
+     "parameters": {
+      "d": -0.53
+     }
+    },
+    {
+     "name": "sdf3d_cylinder",
+     "type": "sdf3d_cylinder",
+     "parameters": {
+      "axis": 1,
+      "l": 0.25,
+      "r": 0.25
+     }
+    },
+    {
+     "name": "shape",
+     "type": "shape",
+     "parameters": {
+      "edge": 0.755,
+      "radius": 0.41,
+      "shape": 1,
+      "sides": 6
+     }
+    },
+    {
+     "name": "4330",
+     "type": "shader",
+     "parameters": {}
+    },
+    {
+     "name": "tex3d_pattern_2",
+     "type": "tex3d_pattern",
+     "parameters": {
+      "mix": 4,
+      "x_scale": 2,
+      "x_wave": 2,
+      "y_scale": 2,
+      "y_wave": 2,
+      "z_scale": 2,
+      "z_wave": 2
+     }
+    },
+    {
+     "name": "tex3d_fbm_4",
+     "type": "tex3d_fbm",
+     "parameters": {
+      "iterations": 3,
+      "noise": 2,
+      "persistence": 0.5,
+      "scale_x": 8,
+      "scale_y": 8,
+      "scale_z": 8
+     }
+    },
+    {
+     "name": "tex3d_distort_2",
+     "type": "shader",
+     "parameters": {
+      "Distort": 0.3
+     }
+    },
+    {
+     "name": "sdf3d_elongation",
+     "type": "sdf3d_elongation",
+     "parameters": {
+      "x": 0.2,
+      "y": 0,
+      "z": 0
+     }
+    },
+    {
+     "name": "sdf3d_torus",
+     "type": "sdf3d_torus",
+     "parameters": {
+      "R": 0.181,
+      "axis": 2,
+      "r": 0.097
+     }
+    },
+    {
+     "name": "fbm",
+     "type": "fbm",
+     "parameters": {
+      "folds": 0,
+      "iterations": 6,
+      "noise": 2,
+      "persistence": 0.5,
+      "scale_x": 8,
+      "scale_y": 8
+     }
+    },
+    {
+     "name": "splatter",
+     "type": "splatter",
+     "parameters": {
+      "count": 25,
+      "inputs": 0,
+      "rotate": 0,
+      "scale": 0,
+      "scale_x": 1,
+      "scale_y": 1,
+      "value": 0,
+      "variations": false
+     }
+    },
+    {
+     "name": "shape_2_2",
+     "type": "shape",
+     "parameters": {
+      "edge": 1,
+      "radius": 0.13,
+      "shape": 0,
+      "sides": 6
+     }
+    },
+    {
+     "name": "shape_2",
+     "type": "shape",
+     "parameters": {
+      "edge": 1,
+      "radius": 0.12,
+      "shape": 1,
+      "sides": 6
+     }
+    },
+    {
+     "name": "shape_2_3",
+     "type": "shape",
+     "parameters": {
+      "edge": 1,
+      "radius": 0.06,
+      "shape": 2,
+      "sides": 5
+     }
+    },
+    {
+     "name": "shape_2_2_2",
+     "type": "shape",
+     "parameters": {
+      "edge": 1,
+      "radius": 0.12,
+      "shape": 3,
+      "sides": 7
+     }
+    },
+    {
+     "name": "tile2x2",
+     "type": "tile2x2",
+     "parameters": {}
+    },
+    {
+     "name": "splatter_color",
+     "type": "splatter_color",
+     "parameters": {
+      "count": 100,
+      "opacity": 0,
+      "rotate": 0,
+      "scale": 0,
+      "scale_x": 1,
+      "scale_y": 1,
+      "select_inputs": 0,
+      "variations": false
+     }
+    },
+    {
+     "name": "tiler_color",
+     "type": "tiler_color",
+     "parameters": {
+      "fixed_offset": 0,
+      "offset": 0.62,
+      "opacity": 0,
+      "overlap": 1,
+      "rotate": 45,
+      "scale": 0.2,
+      "scale_x": 1,
+      "scale_y": 1,
+      "select_inputs": 1,
+      "tx": 8,
+      "ty": 8,
+      "variations": false
+     }
+    },
+    {
+     "name": "splatter_2",
+     "type": "splatter",
+     "parameters": {
+      "count": 8,
+      "inputs": 0,
+      "rotate": 0,
+      "scale": 0,
+      "scale_x": 1,
+      "scale_y": 1,
+      "value": 0,
+      "variations": false
+     }
+    },
+    {
+     "name": "fill_to_random_grey",
+     "type": "fill_to_random_grey",
+     "parameters": {
+      "edgecolor": 1
+     }
+    },
+    {
+     "name": "fill_to_random_color",
+     "type": "fill_to_random_color",
+     "parameters": {
+      "edgecolor": "#ffffff"
+     }
+    },
+    {
+     "name": "fill_to_uv",
+     "type": "fill_to_uv",
+     "parameters": {
+      "mode": 0
+     }
+    },
+    {
+     "name": "1644",
+     "type": "shader",
+     "parameters": {}
+    },
+    {
+     "name": "fill_to_position",
+     "type": "fill_to_position",
+     "parameters": {
+      "axis": 0
+     }
+    },
+    {
+     "name": "fill_to_size",
+     "type": "fill_to_size",
+     "parameters": {
+      "formula": 1
+     }
+    },
+    {
+     "name": "image",
+     "type": "image",
+     "parameters": {
+      "image": "C:/Users/rodzi/Downloads/Qpalette.png"
+     }
+    },
+    {
+     "name": "shape_3",
+     "type": "shape",
+     "parameters": {
+      "edge": 0.1,
+      "radius": 0.85,
+      "shape": 1,
+      "sides": 6
+     }
+    },
+    {
+     "name": "colormap",
+     "type": "colormap",
+     "parameters": {
+      "direction": 0,
+      "offset": 0.48
+     }
+    },
+    {
+     "name": "fbm2",
+     "type": "fbm2",
+     "parameters": {
+      "folds": 0,
+      "iterations": 5,
+      "noise": 0,
+      "offset": 0,
+      "persistence": 0.5,
+      "scale_x": 2,
+      "scale_y": 2
+     }
+    },
+    {
+     "name": "perlin_color",
+     "type": "perlin_color",
+     "parameters": {
+      "iterations": 3,
+      "persistence": 0.5,
+      "scale_x": 4,
+      "scale_y": 4
+     }
+    },
+    {
+     "name": "perlin_color_2",
+     "type": "perlin_color",
+     "parameters": {
+      "iterations": 1,
+      "persistence": 0.5,
+      "scale_x": 32,
+      "scale_y": 32
+     }
+    },
+    {
+     "name": "uniform_greyscale_2",
+     "type": "morphology2",
+     "parameters": {
+      "distance": 0.05,
+      "operation": 0,
+      "resolution": 10
+     }
+    }
+   ]
+  },
+  "dry_earth": {
+   "nodes": 13,
+   "categories": [
+    "organic"
+   ],
+   "types": {
+    "voronoi": 1,
+    "colorize": 5,
+    "perlin": 2,
+    "blend": 2,
+    "warp": 1,
+    "normal_map": 1
+   },
+   "channels": {
+    "albedo": "blend(warp(colorize(voronoi),perlin),colorize(perlin))",
+    "metallic": "colorize(perlin)",
+    "normal": "normal_map(colorize(blend(perlin,colorize)))",
+    "depth": "blend(perlin,colorize(warp(colorize,perlin)))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao_light_affect": 1,
+    "depth_scale": 0.1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal_scale": 1,
+    "resolution": 1,
+    "roughness": 1,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "voronoi_0",
+     "type": "voronoi",
+     "parameters": {
+      "intensity": 0.6,
+      "randomness": 1,
+      "scale_x": 4,
+      "scale_y": 4,
+      "stretch_x": 1,
+      "stretch_y": 1
+     }
+    },
+    {
+     "name": "perlin_1",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 3,
+      "persistence": 0.5,
+      "scale_x": 4,
+      "scale_y": 4
+     }
+    },
+    {
+     "name": "perlin_0",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 10,
+      "persistence": 0.9,
+      "scale_x": 2,
+      "scale_y": 2
+     }
+    },
+    {
+     "name": "warp_0",
+     "type": "warp",
+     "parameters": {
+      "amount": 0.4,
+      "eps": 0.045,
+      "epsilon": 0
+     }
+    }
+   ]
+  },
+  "emmental": {
+   "nodes": 9,
+   "categories": [
+    "abstract/other"
+   ],
+   "types": {
+    "voronoi": 1,
+    "colorize": 4,
+    "uniform": 1,
+    "normal_map": 1,
+    "pattern": 1
+   },
+   "channels": {
+    "normal": "normal_map(colorize(colorize(colorize)))",
+    "depth": "colorize(colorize(voronoi))",
+    "albedo": "uniform",
+    "sss": "colorize(voronoi)"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao": 1,
+    "depth_scale": 0.45,
+    "emission_energy": 0,
+    "flags_transparent": false,
+    "metallic": 0.3,
+    "normal": 1,
+    "roughness": 0.75,
+    "size": 11,
+    "sss": 1
+   },
+   "key_nodes": [
+    {
+     "name": "voronoi",
+     "type": "voronoi",
+     "parameters": {
+      "intensity": 1,
+      "randomness": 0.49,
+      "scale_x": 6,
+      "scale_y": 6,
+      "stretch_x": 1,
+      "stretch_y": 1
+     }
+    },
+    {
+     "name": "pattern",
+     "type": "pattern",
+     "parameters": {
+      "mix": 4,
+      "x_scale": 16,
+      "x_wave": 2,
+      "y_scale": 16,
+      "y_wave": 2
+     }
+    }
+   ]
+  },
+  "floor1": {
+   "nodes": 22,
+   "categories": [
+    "tiles/floor"
+   ],
+   "types": {
+    "transform": 3,
+    "perlin": 1,
+    "normal_map": 1,
+    "colorize": 7,
+    "blend": 6,
+    "bricks": 1,
+    "pattern": 1,
+    "uniform": 1
+   },
+   "channels": {
+    "normal": "normal_map(blend(perlin,blend(blend,colorize)))",
+    "metallic": "uniform",
+    "albedo": "blend(colorize(perlin),blend(colorize(perlin)\u00d72,blend(bricks,colorize)),colorize(transform(blend)))",
+    "roughness": "colorize(blend(perlin,blend(blend,colorize)))",
+    "depth": "colorize(blend(perlin,blend(blend,colorize)))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao_light_affect": 1,
+    "depth_scale": 0.05,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal_scale": 1,
+    "resolution": 1,
+    "roughness": 1,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "transform_1",
+     "type": "transform",
+     "parameters": {
+      "repeat": true,
+      "rotate": 90,
+      "scale_x": 1,
+      "scale_y": 1,
+      "translate_x": 0,
+      "translate_y": 0
+     }
+    },
+    {
+     "name": "perlin_1",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 7,
+      "persistence": 0.95,
+      "scale_x": 4,
+      "scale_y": 4
+     }
+    },
+    {
+     "name": "bricks_0",
+     "type": "bricks",
+     "parameters": {
+      "bevel": 0.03,
+      "columns": 6,
+      "corner": 0,
+      "mortar": 0.01,
+      "pattern": 0,
+      "repeat": 1,
+      "round": 0,
+      "row_offset": 0,
+      "rows": 6
+     }
+    },
+    {
+     "name": "transform_2",
+     "type": "transform",
+     "parameters": {
+      "repeat": true,
+      "rotate": 0,
+      "scale_x": 0.5,
+      "scale_y": 0.5,
+      "translate_x": 0,
+      "translate_y": 0
+     }
+    },
+    {
+     "name": "pattern_0",
+     "type": "pattern",
+     "parameters": {
+      "mix": 0,
+      "x_scale": 1,
+      "x_wave": 0,
+      "y_scale": 1,
+      "y_wave": 0
+     }
+    },
+    {
+     "name": "transform_0",
+     "type": "transform",
+     "parameters": {
+      "repeat": false,
+      "rotate": 0,
+      "scale_x": 0.5,
+      "scale_y": 1,
+      "translate_x": 0,
+      "translate_y": 0
+     }
+    }
+   ]
+  },
+  "floor2": {
+   "nodes": 8,
+   "categories": [
+    "tiles/floor"
+   ],
+   "types": {
+    "perlin": 1,
+    "bricks": 1,
+    "normal_map": 1,
+    "colorize": 2,
+    "blend": 1,
+    "uniform": 1
+   },
+   "channels": {
+    "albedo": "blend(bricks,colorize(perlin))",
+    "normal": "normal_map(bricks)",
+    "roughness": "colorize(blend(bricks,colorize(perlin)))",
+    "metallic": "uniform"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao_light_affect": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal_scale": 1,
+    "resolution": 1,
+    "roughness": 1,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "perlin_0",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 7,
+      "persistence": 0.85,
+      "scale_x": 8,
+      "scale_y": 8
+     }
+    },
+    {
+     "name": "bricks_0",
+     "type": "bricks",
+     "parameters": {
+      "bevel": 0.01,
+      "columns": 4,
+      "corner": 0,
+      "mortar": 0.01,
+      "pattern": 0,
+      "repeat": 1,
+      "round": 0,
+      "row_offset": 0,
+      "rows": 4
+     }
+    }
+   ]
+  },
+  "grass_with_flowers": {
+   "nodes": 10,
+   "categories": [
+    "organic"
+   ],
+   "types": {
+    "colorize": 3,
+    "normal_map": 1,
+    "blend": 2,
+    "uniform": 1,
+    "perlin": 1,
+    "voronoi": 1
+   },
+   "channels": {
+    "normal": "normal_map(perlin)",
+    "albedo": "blend(blend(colorize(perlin),voronoi,colorize(voronoi)),uniform,colorize(voronoi))",
+    "roughness": "colorize(voronoi)"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao_light_affect": 1,
+    "depth_scale": 1,
+    "emission_energy": 0,
+    "metallic": 0,
+    "normal_scale": 1,
+    "resolution": 1,
+    "roughness": 1,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "perlin_0",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 9,
+      "persistence": 0.8,
+      "scale_x": 6,
+      "scale_y": 6
+     }
+    },
+    {
+     "name": "voronoi_0",
+     "type": "voronoi",
+     "parameters": {
+      "intensity": 1,
+      "randomness": 1,
+      "scale_x": 14,
+      "scale_y": 14,
+      "stretch_x": 1,
+      "stretch_y": 1
+     }
+    }
+   ]
+  },
+  "halloween": {
+   "nodes": 12,
+   "categories": [
+    "abstract/other"
+   ],
+   "types": {
+    "graph": 1,
+    "pattern": 1,
+    "colorize": 4,
+    "normal_map": 1,
+    "perlin": 1,
+    "transform": 1,
+    "blend": 1
+   },
+   "channels": {
+    "albedo": "colorize(perlin)",
+    "normal": "normal_map(colorize(pattern))",
+    "depth": "blend(colorize(colorize(pattern)),transform(graph))",
+    "emission": "colorize(transform(graph))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao_light_affect": 1,
+    "depth_scale": 0.3,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal_scale": 1,
+    "roughness": 1,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "pattern",
+     "type": "pattern",
+     "parameters": {
+      "mix": 0,
+      "x_scale": 8,
+      "x_wave": 0,
+      "y_scale": 4,
+      "y_wave": 4
+     }
+    },
+    {
+     "name": "perlin",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 1,
+      "persistence": 0.5,
+      "scale_x": 4,
+      "scale_y": 2
+     }
+    },
+    {
+     "name": "transform",
+     "type": "transform",
+     "parameters": {
+      "repeat": false,
+      "rotate": 0,
+      "scale_x": 0.4,
+      "scale_y": 0.4,
+      "translate_x": 0,
+      "translate_y": 0
+     }
+    }
+   ]
+  },
+  "improved_brick": {
+   "nodes": 29,
+   "categories": [
+    "brick"
+   ],
+   "types": {
+    "bricks": 2,
+    "colorize": 10,
+    "blend": 6,
+    "perlin": 4,
+    "uniform": 1,
+    "normal_map": 3
+   },
+   "channels": {
+    "depth": "colorize(bricks)",
+    "albedo": "blend(blend(colorize(blend),colorize(perlin),colorize(bricks)),uniform,colorize(perlin))",
+    "ao": "colorize(bricks)",
+    "normal": "blend(blend(normal_map(colorize),normal_map(blend),blend(colorize\u00d72)),normal_map(colorize(perlin)),colorize..."
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao_light_affect": 1,
+    "depth_scale": 0.05,
+    "emission_energy": 1,
+    "metallic": 0,
+    "normal_scale": 1,
+    "roughness": 0.85,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "bricks",
+     "type": "bricks",
+     "parameters": {
+      "bevel": 0,
+      "columns": 6,
+      "corner": 0,
+      "mortar": 0.088,
+      "pattern": 1,
+      "repeat": 1,
+      "round": 0,
+      "row_offset": 0.5,
+      "rows": 20
+     }
+    },
+    {
+     "name": "perlin",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 8,
+      "persistence": 0.5,
+      "scale_x": 16,
+      "scale_y": 16
+     }
+    },
+    {
+     "name": "perlin_2",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 8,
+      "persistence": 0.5,
+      "scale_x": 128,
+      "scale_y": 128
+     }
+    },
+    {
+     "name": "perlin_3",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 8,
+      "persistence": 0.8,
+      "scale_x": 16,
+      "scale_y": 16
+     }
+    },
+    {
+     "name": "perlin_4",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 8,
+      "persistence": 1,
+      "scale_x": 4,
+      "scale_y": 4
+     }
+    },
+    {
+     "name": "bricks_2",
+     "type": "bricks",
+     "parameters": {
+      "bevel": 0.088,
+      "columns": 6,
+      "corner": 0,
+      "mortar": 0,
+      "pattern": 1,
+      "repeat": 1,
+      "round": 0,
+      "row_offset": 0.5,
+      "rows": 20
+     }
+    }
+   ]
+  },
+  "lava": {
+   "nodes": 10,
+   "categories": [
+    "organic"
+   ],
+   "types": {
+    "colorize": 4,
+    "normal_map": 1,
+    "blend": 1,
+    "warp": 1,
+    "voronoi": 1,
+    "perlin": 1
+   },
+   "channels": {
+    "albedo": "colorize(blend(perlin,warp(voronoi,perlin)))",
+    "roughness": "colorize(warp(voronoi,perlin))",
+    "normal": "normal_map(warp(voronoi,perlin))",
+    "emission": "colorize(warp(voronoi,perlin))",
+    "metallic": "colorize(warp(voronoi,perlin))",
+    "ao": "colorize(warp(voronoi,perlin))",
+    "depth": "colorize(warp(voronoi,perlin))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao_light_affect": 1,
+    "depth_scale": 0.45,
+    "emission_energy": 2,
+    "metallic": 1,
+    "normal_scale": 1,
+    "resolution": 1,
+    "roughness": 1,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "warp_0",
+     "type": "warp",
+     "parameters": {
+      "amount": 0.3,
+      "eps": 0.045,
+      "epsilon": 0
+     }
+    },
+    {
+     "name": "voronoi_0",
+     "type": "voronoi",
+     "parameters": {
+      "intensity": 0.55,
+      "randomness": 1,
+      "scale_x": 6,
+      "scale_y": 6,
+      "stretch_x": 1,
+      "stretch_y": 1
+     }
+    },
+    {
+     "name": "perlin_0",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 8,
+      "persistence": 0.75,
+      "scale_x": 4,
+      "scale_y": 4
+     }
+    }
+   ]
+  },
+  "load_effect": {
+   "nodes": 32,
+   "categories": [
+    "abstract/other"
+   ],
+   "types": {
+    "material_unlit": 1,
+    "shape": 4,
+    "tones_range": 1,
+    "mirror": 2,
+    "translate": 4,
+    "rotate": 2,
+    "math": 6,
+    "tiler": 1,
+    "transform2": 5,
+    "perlin": 1,
+    "combine": 1,
+    "scale": 1,
+    "remote": 1,
+    "debug": 1,
+    "kaleidoscope": 1
+   },
+   "channels": {},
+   "material": {},
+   "key_nodes": [
+    {
+     "name": "Material",
+     "type": "material_unlit",
+     "parameters": {
+      "blend": 0
+     }
+    },
+    {
+     "name": "shape",
+     "type": "shape",
+     "parameters": {
+      "edge": 1,
+      "radius": 0.96,
+      "shape": 0,
+      "sides": 6
+     }
+    },
+    {
+     "name": "tones_range",
+     "type": "tones_range",
+     "parameters": {
+      "contrast": 0,
+      "invert": false,
+      "value": 0.14,
+      "width": 0.27
+     }
+    },
+    {
+     "name": "shape_2",
+     "type": "shape",
+     "parameters": {
+      "edge": 1,
+      "radius": 0.1,
+      "shape": 1,
+      "sides": 4
+     }
+    },
+    {
+     "name": "mirror",
+     "type": "mirror",
+     "parameters": {
+      "direction": 0,
+      "offset": 0.11
+     }
+    },
+    {
+     "name": "translate",
+     "type": "translate",
+     "parameters": {
+      "translate_x": -0.055,
+      "translate_y": 0
+     }
+    },
+    {
+     "name": "rotate",
+     "type": "rotate",
+     "parameters": {
+      "cx": 0,
+      "cy": 0,
+      "rotate": "$time*10.0"
+     }
+    },
+    {
+     "name": "mirror_2",
+     "type": "mirror",
+     "parameters": {
+      "direction": 0,
+      "offset": 0.28
+     }
+    },
+    {
+     "name": "translate_2",
+     "type": "translate",
+     "parameters": {
+      "translate_x": 0.145,
+      "translate_y": 0
+     }
+    },
+    {
+     "name": "rotate_2",
+     "type": "rotate",
+     "parameters": {
+      "cx": 0,
+      "cy": 0,
+      "rotate": "$time*120.0"
+     }
+    },
+    {
+     "name": "shape_3",
+     "type": "shape",
+     "parameters": {
+      "edge": 1,
+      "radius": 0.09,
+      "shape": 1,
+      "sides": 4
+     }
+    },
+    {
+     "name": "math",
+     "type": "math",
+     "parameters": {
+      "clamp": false,
+      "default_in1": 0,
+      "default_in2": 0,
+      "op": 14
+     }
+    },
+    {
+     "name": "math_2",
+     "type": "math",
+     "parameters": {
+      "clamp": false,
+      "default_in1": 0,
+      "default_in2": 0,
+      "op": 14
+     }
+    },
+    {
+     "name": "tiler",
+     "type": "tiler",
+     "parameters": {
+      "fixed_offset": 0,
+      "offset": 0.58,
+      "overlap": 1,
+      "rotate": 180,
+      "scale": 0.28,
+      "scale_x": 0.08,
+      "scale_y": 0.06,
+      "select_inputs": 0,
+      "tx": 16,
+      "ty": 16,
+      "value": 0.53
+     }
+    },
+    {
+     "name": "transform2",
+     "type": "transform2",
+     "parameters": {
+      "mode": 2,
+      "rotate": 0,
+      "scale_x": 1,
+      "scale_y": 1,
+      "translate_x": 0.005,
+      "translate_y": 0
+     }
+    },
+    {
+     "name": "perlin",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 5,
+      "persistence": 0.75,
+      "scale_x": 4,
+      "scale_y": 4
+     }
+    },
+    {
+     "name": "transform2_2",
+     "type": "transform2",
+     "parameters": {
+      "mode": 1,
+      "rotate": 0,
+      "scale_x": 0.1,
+      "scale_y": 0.1,
+      "translate_x": "$time*0.11",
+      "translate_y": "$time*0.01"
+     }
+    },
+    {
+     "name": "transform2_3",
+     "type": "transform2",
+     "parameters": {
+      "mode": 2,
+      "rotate": 0,
+      "scale_x": 1,
+      "scale_y": 1,
+      "translate_x": 0.005,
+      "translate_y": 0.005
+     }
+    },
+    {
+     "name": "transform2_4",
+     "type": "transform2",
+     "parameters": {
+      "mode": 2,
+      "rotate": 0,
+      "scale_x": 1,
+      "scale_y": 1,
+      "translate_x": -0.005,
+      "translate_y": 0
+     }
+    },
+    {
+     "name": "combine",
+     "type": "combine",
+     "parameters": {}
+    },
+    {
+     "name": "scale",
+     "type": "scale",
+     "parameters": {
+      "cx": 0,
+      "cy": 0,
+      "scale_x": 1,
+      "scale_y": "$ratio"
+     }
+    },
+    {
+     "name": "1537",
+     "type": "remote",
+     "parameters": {
+      "ratio": 1.65
+     }
+    },
+    {
+     "name": "math_3",
+     "type": "math",
+     "parameters": {
+      "clamp": false,
+      "default_in1": 0,
+      "default_in2": 0.66,
+      "op": 2
+     }
+    },
+    {
+     "name": "debug",
+     "type": "debug",
+     "parameters": {}
+    },
+    {
+     "name": "translate_3",
+     "type": "translate",
+     "parameters": {
+      "translate_x": "0.1*$time",
+      "translate_y": 0
+     }
+    },
+    {
+     "name": "transform2_5",
+     "type": "transform2",
+     "parameters": {
+      "mode": 2,
+      "rotate": 0,
+      "scale_x": 1.445,
+      "scale_y": 1.51,
+      "translate_x": "0.05*$time",
+      "translate_y": 0
+     }
+    },
+    {
+     "name": "math_4",
+     "type": "math",
+     "parameters": {
+      "clamp": false,
+      "default_in1": 0,
+      "default_in2": 0,
+      "op": 0
+     }
+    },
+    {
+     "name": "math_5",
+     "type": "math",
+     "parameters": {
+      "clamp": false,
+      "default_in1": 0,
+      "default_in2": 0.43,
+      "op": 2
+     }
+    },
+    {
+     "name": "math_6",
+     "type": "math",
+     "parameters": {
+      "clamp": false,
+      "default_in1": 0,
+      "default_in2": 0,
+      "op": 0
+     }
+    },
+    {
+     "name": "shape_4",
+     "type": "shape",
+     "parameters": {
+      "edge": 1,
+      "radius": 0.07,
+      "shape": 0,
+      "sides": 6
+     }
+    },
+    {
+     "name": "translate_4",
+     "type": "translate",
+     "parameters": {
+      "translate_x": 0,
+      "translate_y": -0.335
+     }
+    },
+    {
+     "name": "kaleidoscope",
+     "type": "kaleidoscope",
+     "parameters": {
+      "count": 12,
+      "offset": 0
+     }
+    }
+   ]
+  },
+  "mandala": {
+   "nodes": 15,
+   "categories": [
+    "abstract/other"
+   ],
+   "types": {
+    "graph": 6,
+    "transform": 4,
+    "colorize": 3,
+    "perlin": 1
+   },
+   "channels": {
+    "normal": "graph(graph(graph\u00d72,colorize(transform)\u00d72))",
+    "depth": "graph(graph(graph\u00d72,colorize(transform)\u00d72))",
+    "albedo": "colorize(perlin)"
+   },
+   "material": {
+    "albedo_color": "#828282",
+    "ao_light_affect": 1,
+    "depth_scale": 0.15,
+    "emission_energy": 1,
+    "metallic": 0.25,
+    "normal_scale": 1,
+    "roughness": 1,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "transform",
+     "type": "transform",
+     "parameters": {
+      "repeat": true,
+      "rotate": 0,
+      "scale_x": 0.3,
+      "scale_y": 0.3,
+      "translate_x": 0.15,
+      "translate_y": 0.15
+     }
+    },
+    {
+     "name": "transform_2",
+     "type": "transform",
+     "parameters": {
+      "repeat": false,
+      "rotate": 0,
+      "scale_x": 0.4,
+      "scale_y": 0.4,
+      "translate_x": 0,
+      "translate_y": 0
+     }
+    },
+    {
+     "name": "transform_2_2",
+     "type": "transform",
+     "parameters": {
+      "repeat": true,
+      "rotate": 0,
+      "scale_x": 0.3,
+      "scale_y": 0.3,
+      "translate_x": 0,
+      "translate_y": 0
+     }
+    },
+    {
+     "name": "perlin",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 7,
+      "persistence": 0.5,
+      "scale_x": 16,
+      "scale_y": 16
+     }
+    },
+    {
+     "name": "transform_3",
+     "type": "transform",
+     "parameters": {
+      "repeat": false,
+      "rotate": 0,
+      "scale_x": 1.15,
+      "scale_y": 1.15,
+      "translate_x": 0,
+      "translate_y": 0
+     }
+    }
+   ]
+  },
+  "mandelbrot": {
+   "nodes": 3,
+   "categories": [
+    "abstract/other"
+   ],
+   "types": {
+    "shader": 1,
+    "colorize": 1
+   },
+   "channels": {
+    "emission": "colorize(shader)"
+   },
+   "material": {
+    "albedo_color": "#000000",
+    "ao_light_affect": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal_scale": 1,
+    "resolution": 1,
+    "roughness": 1,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "custom_0",
+     "type": "shader",
+     "parameters": {
+      "contrast": 10,
+      "scale": 1,
+      "x": 0,
+      "y": 0
+     }
+    }
+   ]
+  },
+  "marble": {
+   "nodes": 12,
+   "categories": [
+    "organic"
+   ],
+   "types": {
+    "invert": 1,
+    "uniform_greyscale": 1,
+    "graph": 4,
+    "mwf_map": 2,
+    "mwf_mix": 2,
+    "mwf_output": 1
+   },
+   "channels": {
+    "albedo": "mwf_output(mwf_mix(uniform_greyscale,graph\u00d72,mwf_mix(mwf_map\u00d710)\u00d75)\u00d75)",
+    "metallic": "mwf_output(mwf_mix(uniform_greyscale,graph\u00d72,mwf_mix(mwf_map\u00d710)\u00d75)\u00d75)",
+    "roughness": "mwf_output(mwf_mix(uniform_greyscale,graph\u00d72,mwf_mix(mwf_map\u00d710)\u00d75)\u00d75)",
+    "emission": "mwf_output(mwf_mix(uniform_greyscale,graph\u00d72,mwf_mix(mwf_map\u00d710)\u00d75)\u00d75)",
+    "normal": "mwf_output(mwf_mix(uniform_greyscale,graph\u00d72,mwf_mix(mwf_map\u00d710)\u00d75)\u00d75)",
+    "ao": "mwf_output(mwf_mix(uniform_greyscale,graph\u00d72,mwf_mix(mwf_map\u00d710)\u00d75)\u00d75)",
+    "depth": "mwf_output(mwf_mix(uniform_greyscale,graph\u00d72,mwf_mix(mwf_map\u00d710)\u00d75)\u00d75)"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao": 1,
+    "depth_scale": 0,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal": 1,
+    "roughness": 1,
+    "size": 11,
+    "sss": 0
+   },
+   "key_nodes": [
+    {
+     "name": "invert",
+     "type": "invert",
+     "parameters": {}
+    },
+    {
+     "name": "mwf_map",
+     "type": "mwf_map",
+     "parameters": {}
+    },
+    {
+     "name": "mwf_mix",
+     "type": "mwf_mix",
+     "parameters": {}
+    },
+    {
+     "name": "mwf_map_2",
+     "type": "mwf_map",
+     "parameters": {}
+    },
+    {
+     "name": "mwf_mix_2",
+     "type": "mwf_mix",
+     "parameters": {}
+    },
+    {
+     "name": "mwf_output",
+     "type": "mwf_output",
+     "parameters": {
+      "param0": 1,
+      "param2": 1
+     }
+    }
+   ]
+  },
+  "materials": {
+   "nodes": 7,
+   "categories": [
+    "abstract/other"
+   ],
+   "types": {
+    "graph": 3,
+    "switch": 1,
+    "uniform_greyscale": 1,
+    "mwf_output": 1
+   },
+   "channels": {
+    "albedo": "mwf_output(uniform_greyscale,switch(graph\u00d712)\u00d74)",
+    "metallic": "mwf_output(uniform_greyscale,switch(graph\u00d712)\u00d74)",
+    "roughness": "mwf_output(uniform_greyscale,switch(graph\u00d712)\u00d74)",
+    "emission": "mwf_output(uniform_greyscale,switch(graph\u00d712)\u00d74)",
+    "normal": "mwf_output(uniform_greyscale,switch(graph\u00d712)\u00d74)",
+    "ao": "mwf_output(uniform_greyscale,switch(graph\u00d712)\u00d74)",
+    "depth": "mwf_output(uniform_greyscale,switch(graph\u00d712)\u00d74)"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal": 1,
+    "roughness": 1,
+    "size": 11,
+    "sss": 0
+   },
+   "key_nodes": [
+    {
+     "name": "switch",
+     "type": "switch",
+     "parameters": {
+      "choices": 3,
+      "outputs": 4,
+      "source": 1
+     }
+    },
+    {
+     "name": "mwf_output",
+     "type": "mwf_output",
+     "parameters": {
+      "param0": 1,
+      "param2": 1
+     }
+    }
+   ]
+  },
+  "medieval_wall": {
+   "nodes": 42,
+   "categories": [
+    "stone"
+   ],
+   "types": {
+    "graph": 7,
+    "blend": 1,
+    "perlin": 1,
+    "colorize": 2,
+    "voronoi": 1,
+    "transform": 1,
+    "uniform": 2,
+    "mwf_mix": 4,
+    "mwf_output": 4,
+    "mwf_map": 2,
+    "mwf_create_map": 5,
+    "normal_map": 1,
+    "mwf_mix_maps": 1,
+    "brightness_contrast": 1
+   },
+   "channels": {
+    "albedo": "mwf_output(mwf_mix(mwf_map(mwf_mix_maps,graph\u00d73)\u00d75,mwf_map(mwf_create_map,colorize,uniform\u00d72,normal_map)\u00d75)\u00d75)",
+    "metallic": "mwf_output(mwf_mix(mwf_map(mwf_mix_maps,graph\u00d73)\u00d75,mwf_map(mwf_create_map,colorize,uniform\u00d72,normal_map)\u00d75)\u00d75)",
+    "roughness": "mwf_output(mwf_mix(mwf_map(mwf_mix_maps,graph\u00d73)\u00d75,mwf_map(mwf_create_map,colorize,uniform\u00d72,normal_map)\u00d75)\u00d75)",
+    "emission": "mwf_output(mwf_mix(mwf_map(mwf_mix_maps,graph\u00d73)\u00d75,mwf_map(mwf_create_map,colorize,uniform\u00d72,normal_map)\u00d75)\u00d75)",
+    "normal": "mwf_output(mwf_mix(mwf_map(mwf_mix_maps,graph\u00d73)\u00d75,mwf_map(mwf_create_map,colorize,uniform\u00d72,normal_map)\u00d75)\u00d75)",
+    "ao": "mwf_output(mwf_mix(mwf_map(mwf_mix_maps,graph\u00d73)\u00d75,mwf_map(mwf_create_map,colorize,uniform\u00d72,normal_map)\u00d75)\u00d75)",
+    "depth": "mwf_output(mwf_mix(mwf_map(mwf_mix_maps,graph\u00d73)\u00d75,mwf_map(mwf_create_map,colorize,uniform\u00d72,normal_map)\u00d75)\u00d75)"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao": 1.0,
+    "depth_scale": 0.2,
+    "emission_energy": 1.0,
+    "flags_transparent": true,
+    "metallic": 1.0,
+    "normal": 1.0,
+    "roughness": 1.0,
+    "size": 11.0,
+    "sss": 1.0
+   },
+   "key_nodes": [
+    {
+     "name": "perlin_2",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 6.0,
+      "persistence": 0.85,
+      "scale_x": 16.0,
+      "scale_y": 16.0
+     }
+    },
+    {
+     "name": "voronoi",
+     "type": "voronoi",
+     "parameters": {
+      "intensity": 1.0,
+      "randomness": 0.75,
+      "scale_x": 16.0,
+      "scale_y": 16.0,
+      "stretch_x": 1.0,
+      "stretch_y": 1.0
+     }
+    },
+    {
+     "name": "transform",
+     "type": "transform",
+     "parameters": {
+      "repeat": false,
+      "rotate": 0.0,
+      "scale_x": 1.0,
+      "scale_y": 1.0,
+      "translate_x": 0.03,
+      "translate_y": 0.03
+     }
+    },
+    {
+     "name": "mwf_mix",
+     "type": "mwf_mix",
+     "parameters": {}
+    },
+    {
+     "name": "mwf_output",
+     "type": "mwf_output",
+     "parameters": {
+      "param0": 0.5,
+      "param2": 2.0
+     }
+    },
+    {
+     "name": "mwf_map",
+     "type": "mwf_map",
+     "parameters": {}
+    },
+    {
+     "name": "mwf_map_2",
+     "type": "mwf_map",
+     "parameters": {}
+    },
+    {
+     "name": "mwf_create_map",
+     "type": "mwf_create_map",
+     "parameters": {
+      "angle": 0.0,
+      "height": 1.0
+     }
+    },
+    {
+     "name": "mwf_create_map_2",
+     "type": "mwf_create_map",
+     "parameters": {
+      "angle": 90.0,
+      "height": 1.0
+     }
+    },
+    {
+     "name": "mwf_create_map_2_2",
+     "type": "mwf_create_map",
+     "parameters": {
+      "angle": -45.0,
+      "height": 0.8
+     }
+    },
+    {
+     "name": "mwf_create_map_2_2_2",
+     "type": "mwf_create_map",
+     "parameters": {
+      "angle": 45.0,
+      "height": 0.8
+     }
+    },
+    {
+     "name": "mwf_mix_maps",
+     "type": "mwf_mix_maps",
+     "parameters": {}
+    },
+    {
+     "name": "mwf_create_map_3",
+     "type": "mwf_create_map",
+     "parameters": {
+      "angle": 0.0,
+      "height": 1.0
+     }
+    },
+    {
+     "name": "brightness_contrast",
+     "type": "brightness_contrast",
+     "parameters": {
+      "brightness": 0.0,
+      "contrast": 1.0
+     }
+    },
+    {
+     "name": "mwf_output_2",
+     "type": "mwf_output",
+     "parameters": {
+      "param0": 0.5,
+      "param2": 2.0
+     }
+    },
+    {
+     "name": "mwf_mix_2",
+     "type": "mwf_mix",
+     "parameters": {}
+    },
+    {
+     "name": "mwf_mix_3",
+     "type": "mwf_mix",
+     "parameters": {}
+    },
+    {
+     "name": "mwf_output_3",
+     "type": "mwf_output",
+     "parameters": {
+      "param0": 0.5,
+      "param2": 2.0
+     }
+    },
+    {
+     "name": "mwf_mix_4",
+     "type": "mwf_mix",
+     "parameters": {}
+    },
+    {
+     "name": "mwf_output_4",
+     "type": "mwf_output",
+     "parameters": {
+      "param0": 0.5,
+      "param2": 2.0
+     }
+    }
+   ]
+  },
+  "metal_pattern": {
+   "nodes": 14,
+   "categories": [
+    "metal"
+   ],
+   "types": {
+    "perlin": 2,
+    "colorize": 5,
+    "blend": 3,
+    "uniform": 1,
+    "normal_map": 1,
+    "graph": 1
+   },
+   "channels": {
+    "normal": "normal_map(colorize(graph))",
+    "albedo": "blend(colorize(perlin),uniform,blend(colorize(blend),colorize(graph)))",
+    "roughness": "colorize(blend(colorize(blend),colorize(graph)))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal": 1,
+    "roughness": 1,
+    "size": 11,
+    "sss": 0
+   },
+   "key_nodes": [
+    {
+     "name": "perlin_0",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 7,
+      "persistence": 0.85,
+      "scale_x": 4,
+      "scale_y": 4
+     }
+    },
+    {
+     "name": "perlin_1",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 7,
+      "persistence": 0.9,
+      "scale_x": 4,
+      "scale_y": 4
+     }
+    }
+   ]
+  },
+  "metal_pattern_2": {
+   "nodes": 7,
+   "categories": [
+    "metal"
+   ],
+   "types": {
+    "pattern": 2,
+    "colorize": 1,
+    "transform": 1,
+    "normal_map": 1,
+    "blend": 1
+   },
+   "channels": {
+    "normal": "normal_map(blend(transform(colorize),colorize(pattern),pattern))"
+   },
+   "material": {
+    "albedo_color": "#d2d5f3",
+    "ao_light_affect": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal_scale": 1,
+    "resolution": 1,
+    "roughness": 0.75,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "pattern_1",
+     "type": "pattern",
+     "parameters": {
+      "mix": 4,
+      "x_scale": 4,
+      "x_wave": 2,
+      "y_scale": 4,
+      "y_wave": 2
+     }
+    },
+    {
+     "name": "pattern_0",
+     "type": "pattern",
+     "parameters": {
+      "mix": 0,
+      "x_scale": 40,
+      "x_wave": 1,
+      "y_scale": 8,
+      "y_wave": 1
+     }
+    },
+    {
+     "name": "transform_2",
+     "type": "transform",
+     "parameters": {
+      "repeat": true,
+      "rotate": 90,
+      "scale_x": 1,
+      "scale_y": 1,
+      "translate_x": 0,
+      "translate_y": 0
+     }
+    }
+   ]
+  },
+  "metal_pattern_3": {
+   "nodes": 10,
+   "categories": [
+    "metal"
+   ],
+   "types": {
+    "colorize": 2,
+    "normal_map": 1,
+    "uniform": 3,
+    "pattern": 2,
+    "blend": 1
+   },
+   "channels": {
+    "normal": "normal_map(blend(colorize(pattern)\u00d72))",
+    "albedo": "uniform",
+    "metallic": "uniform",
+    "roughness": "uniform"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao_light_affect": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal_scale": 1,
+    "resolution": 1,
+    "roughness": 1,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "pattern_1",
+     "type": "pattern",
+     "parameters": {
+      "mix": 3,
+      "x_scale": 1,
+      "x_wave": 1,
+      "y_scale": 1,
+      "y_wave": 1
+     }
+    },
+    {
+     "name": "pattern_0",
+     "type": "pattern",
+     "parameters": {
+      "mix": 0,
+      "x_scale": 16,
+      "x_wave": 0,
+      "y_scale": 16,
+      "y_wave": 0
+     }
+    }
+   ]
+  },
+  "mmm_donuts": {
+   "nodes": 36,
+   "categories": [
+    "abstract/other"
+   ],
+   "types": {
+    "shader": 5,
+    "graph": 1,
+    "mwf_create_map": 3,
+    "mwf_map": 3,
+    "uniform": 7,
+    "mwf_mix": 3,
+    "uniform_greyscale": 1,
+    "perlin": 1,
+    "colorize": 1,
+    "mul_detect": 3,
+    "sdf3d_repeat": 2,
+    "mwf_output": 1
+   },
+   "channels": {
+    "albedo": "mwf_output(mwf_mix(mwf_mix(uniform_greyscale,uniform\u00d72,mwf_map\u00d75)\u00d75,mwf_mix(mwf_map\u00d710)\u00d75)\u00d75)",
+    "metallic": "mwf_output(mwf_mix(mwf_mix(uniform_greyscale,uniform\u00d72,mwf_map\u00d75)\u00d75,mwf_mix(mwf_map\u00d710)\u00d75)\u00d75)",
+    "roughness": "mwf_output(mwf_mix(mwf_mix(uniform_greyscale,uniform\u00d72,mwf_map\u00d75)\u00d75,mwf_mix(mwf_map\u00d710)\u00d75)\u00d75)",
+    "emission": "mwf_output(mwf_mix(mwf_mix(uniform_greyscale,uniform\u00d72,mwf_map\u00d75)\u00d75,mwf_mix(mwf_map\u00d710)\u00d75)\u00d75)",
+    "ao": "mwf_output(mwf_mix(mwf_mix(uniform_greyscale,uniform\u00d72,mwf_map\u00d75)\u00d75,mwf_mix(mwf_map\u00d710)\u00d75)\u00d75)",
+    "depth": "mwf_output(mwf_mix(mwf_mix(uniform_greyscale,uniform\u00d72,mwf_map\u00d75)\u00d75,mwf_mix(mwf_map\u00d710)\u00d75)\u00d75)",
+    "normal": "shader(shader(shader(sdf3d_repeat,shader)))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao": 1,
+    "depth_scale": 0.3,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal": 1,
+    "roughness": 1,
+    "size": 11,
+    "sss": 0
+   },
+   "key_nodes": [
+    {
+     "name": "raymarching",
+     "type": "shader",
+     "parameters": {}
+    },
+    {
+     "name": "sdf3d_scale_2",
+     "type": "shader",
+     "parameters": {
+      "s": 0.37
+     }
+    },
+    {
+     "name": "sdf3d_translate_3_2_2",
+     "type": "shader",
+     "parameters": {
+      "x": 0.18,
+      "y": 0.11,
+      "z": 0.14
+     }
+    },
+    {
+     "name": "sdf3d_boolean",
+     "type": "shader",
+     "parameters": {
+      "op": 0
+     }
+    },
+    {
+     "name": "sdf3d_translate_3_2_2_2",
+     "type": "shader",
+     "parameters": {
+      "x": 0,
+      "y": 0,
+      "z": 0.07
+     }
+    },
+    {
+     "name": "mwf_create_map",
+     "type": "mwf_create_map",
+     "parameters": {
+      "angle": 0,
+      "height": 1
+     }
+    },
+    {
+     "name": "mwf_create_map_2",
+     "type": "mwf_create_map",
+     "parameters": {
+      "angle": 0,
+      "height": 1
+     }
+    },
+    {
+     "name": "mwf_create_map_3",
+     "type": "mwf_create_map",
+     "parameters": {
+      "angle": 0,
+      "height": 1
+     }
+    },
+    {
+     "name": "mwf_map",
+     "type": "mwf_map",
+     "parameters": {}
+    },
+    {
+     "name": "mwf_map_2",
+     "type": "mwf_map",
+     "parameters": {}
+    },
+    {
+     "name": "mwf_map_2_2",
+     "type": "mwf_map",
+     "parameters": {}
+    },
+    {
+     "name": "mwf_mix",
+     "type": "mwf_mix",
+     "parameters": {}
+    },
+    {
+     "name": "mwf_mix_2",
+     "type": "mwf_mix",
+     "parameters": {}
+    },
+    {
+     "name": "mwf_mix_3",
+     "type": "mwf_mix",
+     "parameters": {}
+    },
+    {
+     "name": "perlin",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 8,
+      "persistence": 0.95,
+      "scale_x": 4,
+      "scale_y": 4
+     }
+    },
+    {
+     "name": "mul_detect",
+     "type": "mul_detect",
+     "parameters": {
+      "t": 0.01,
+      "v": 0.31
+     }
+    },
+    {
+     "name": "mul_detect_2",
+     "type": "mul_detect",
+     "parameters": {
+      "t": 0.01,
+      "v": 0.87
+     }
+    },
+    {
+     "name": "mul_detect_2_2",
+     "type": "mul_detect",
+     "parameters": {
+      "t": 0.01,
+      "v": 0.08
+     }
+    },
+    {
+     "name": "sdf3d_repeat_3",
+     "type": "sdf3d_repeat",
+     "parameters": {
+      "r": 0.2,
+      "rx": 3,
+      "ry": 3
+     }
+    },
+    {
+     "name": "sdf3d_repeat_3_2",
+     "type": "sdf3d_repeat",
+     "parameters": {
+      "r": 0.2,
+      "rx": 3,
+      "ry": 3
+     }
+    },
+    {
+     "name": "mwf_output_2",
+     "type": "mwf_output",
+     "parameters": {
+      "param0": 1,
+      "param2": 1
+     }
+    }
+   ]
+  },
+  "mosaic": {
+   "nodes": 8,
+   "categories": [
+    "tiles/floor"
+   ],
+   "types": {
+    "voronoi": 1,
+    "normal_map": 1,
+    "colorize": 3,
+    "uniform": 1,
+    "blend": 1
+   },
+   "channels": {
+    "albedo": "blend(colorize(voronoi),voronoi)",
+    "normal": "normal_map(colorize(voronoi))",
+    "metallic": "uniform",
+    "roughness": "colorize(voronoi)"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao_light_affect": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal_scale": 1,
+    "resolution": 1,
+    "roughness": 1,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "voronoi_0",
+     "type": "voronoi",
+     "parameters": {
+      "intensity": 1,
+      "randomness": 1,
+      "scale_x": 32,
+      "scale_y": 32,
+      "stretch_x": 1,
+      "stretch_y": 1
+     }
+    }
+   ]
+  },
+  "paper": {
+   "nodes": 13,
+   "categories": [
+    "organic"
+   ],
+   "types": {
+    "pattern": 2,
+    "colorize": 4,
+    "blend": 2,
+    "perlin": 2,
+    "shape": 1,
+    "transform": 1
+   },
+   "channels": {
+    "albedo": "blend(colorize(pattern)\u00d72)"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao_light_affect": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal_scale": 1,
+    "resolution": 1,
+    "roughness": 1,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "pattern_1",
+     "type": "pattern",
+     "parameters": {
+      "mix": 3,
+      "x_scale": 8,
+      "x_wave": 1,
+      "y_scale": 8,
+      "y_wave": 1
+     }
+    },
+    {
+     "name": "pattern_0",
+     "type": "pattern",
+     "parameters": {
+      "mix": 3,
+      "x_scale": 4,
+      "x_wave": 4,
+      "y_scale": 32,
+      "y_wave": 1
+     }
+    },
+    {
+     "name": "perlin_0",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 3,
+      "persistence": 0.5,
+      "scale_x": 4,
+      "scale_y": 4
+     }
+    },
+    {
+     "name": "shape_0",
+     "type": "shape",
+     "parameters": {
+      "edge": 0.466,
+      "radius": 0.452,
+      "shape": 1,
+      "sides": 4
+     }
+    },
+    {
+     "name": "perlin_1",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 6,
+      "persistence": 0.5,
+      "scale_x": 16,
+      "scale_y": 16
+     }
+    },
+    {
+     "name": "transform_0",
+     "type": "transform",
+     "parameters": {
+      "repeat": true,
+      "rotate": 0,
+      "scale_x": 1,
+      "scale_y": 1,
+      "translate_x": 0.01,
+      "translate_y": 0
+     }
+    }
+   ]
+  },
+  "pentagram": {
+   "nodes": 8,
+   "categories": [
+    "abstract/other"
+   ],
+   "types": {
+    "shape": 2,
+    "colorize": 3,
+    "blend": 1,
+    "graph": 1
+   },
+   "channels": {
+    "emission": "colorize(blend(graph,colorize(shape)))"
+   },
+   "material": {
+    "albedo_color": "#000000",
+    "ao_light_affect": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal_scale": 1,
+    "roughness": 1,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "shape_2",
+     "type": "shape",
+     "parameters": {
+      "edge": 1,
+      "radius": 0.25,
+      "shape": 2,
+      "sides": 5
+     }
+    },
+    {
+     "name": "shape",
+     "type": "shape",
+     "parameters": {
+      "edge": 0.2,
+      "radius": 0.75,
+      "shape": 0,
+      "sides": 2
+     }
+    }
+   ]
+  },
+  "pile_of_bricks": {
+   "nodes": 18,
+   "categories": [
+    "brick"
+   ],
+   "types": {
+    "uniform": 1,
+    "sdf3d_repeat": 4,
+    "sdf3d_scale": 1,
+    "sdf3d_boolean": 3,
+    "graph": 1,
+    "sdf3d_translate": 4,
+    "raymarching": 1,
+    "colorize": 1,
+    "occlusion": 1
+   },
+   "channels": {
+    "albedo": "uniform",
+    "normal": "raymarching(sdf3d_translate(sdf3d_boolean(sdf3d_translate,sdf3d_boolean)))",
+    "depth": "colorize(raymarching(sdf3d_translate(sdf3d_boolean)))",
+    "ao": "occlusion(raymarching(sdf3d_translate(sdf3d_boolean)))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao": 1,
+    "depth_scale": 0.5,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal": 1,
+    "roughness": 1,
+    "size": 11,
+    "sss": 0
+   },
+   "key_nodes": [
+    {
+     "name": "sdf3d_repeat",
+     "type": "sdf3d_repeat",
+     "parameters": {
+      "r": 0.3,
+      "rx": 6,
+      "ry": 6
+     }
+    },
+    {
+     "name": "sdf3d_scale_2",
+     "type": "sdf3d_scale",
+     "parameters": {
+      "s": 0.25
+     }
+    },
+    {
+     "name": "sdf3d_boolean_3",
+     "type": "sdf3d_boolean",
+     "parameters": {
+      "op": 0
+     }
+    },
+    {
+     "name": "sdf3d_repeat_2",
+     "type": "sdf3d_repeat",
+     "parameters": {
+      "r": 0.3,
+      "rx": 6,
+      "ry": 6
+     }
+    },
+    {
+     "name": "sdf3d_translate_3_2",
+     "type": "sdf3d_translate",
+     "parameters": {
+      "x": 0.09,
+      "y": 0.09,
+      "z": 0
+     }
+    },
+    {
+     "name": "sdf3d_repeat_2_2",
+     "type": "sdf3d_repeat",
+     "parameters": {
+      "r": 0.3,
+      "rx": 6,
+      "ry": 6
+     }
+    },
+    {
+     "name": "sdf3d_repeat_3",
+     "type": "sdf3d_repeat",
+     "parameters": {
+      "r": 0.3,
+      "rx": 6,
+      "ry": 6
+     }
+    },
+    {
+     "name": "sdf3d_translate_3_2_2",
+     "type": "sdf3d_translate",
+     "parameters": {
+      "x": 0.09,
+      "y": 0.09,
+      "z": 0
+     }
+    },
+    {
+     "name": "sdf3d_boolean_3_2",
+     "type": "sdf3d_boolean",
+     "parameters": {
+      "op": 0
+     }
+    },
+    {
+     "name": "sdf3d_boolean_3_3",
+     "type": "sdf3d_boolean",
+     "parameters": {
+      "op": 0
+     }
+    },
+    {
+     "name": "sdf3d_translate_3_2_2_2",
+     "type": "sdf3d_translate",
+     "parameters": {
+      "x": 0,
+      "y": 0,
+      "z": 0.3
+     }
+    },
+    {
+     "name": "sdf3d_translate_3_2_3",
+     "type": "sdf3d_translate",
+     "parameters": {
+      "x": 0.04,
+      "y": 0.04,
+      "z": 0.15
+     }
+    },
+    {
+     "name": "raymarching",
+     "type": "raymarching",
+     "parameters": {}
+    },
+    {
+     "name": "occlusion_2",
+     "type": "occlusion",
+     "parameters": {
+      "param0": 9,
+      "param2": 5.2
+     }
+    }
+   ]
+  },
+  "planet": {
+   "nodes": 10,
+   "categories": [
+    "abstract/other"
+   ],
+   "types": {
+    "perlin": 1,
+    "colorize": 4,
+    "normal_map": 1,
+    "pattern": 1,
+    "blend": 1
+   },
+   "channels": {
+    "depth": "colorize(colorize(blend(colorize,perlin)))",
+    "roughness": "colorize(blend(colorize(pattern),perlin))",
+    "albedo": "colorize(colorize(blend(colorize,perlin)))",
+    "normal": "normal_map(colorize(blend(colorize,perlin)))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 0.05,
+    "normal": 1,
+    "roughness": 0.75,
+    "size": 11,
+    "sss": 0
+   },
+   "key_nodes": [
+    {
+     "name": "perlin",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 6,
+      "persistence": 0.5,
+      "scale_x": 8,
+      "scale_y": 8
+     }
+    },
+    {
+     "name": "pattern",
+     "type": "pattern",
+     "parameters": {
+      "mix": 0,
+      "x_scale": 4,
+      "x_wave": 4,
+      "y_scale": 1,
+      "y_wave": 0
+     }
+    }
+   ]
+  },
+  "radiation": {
+   "nodes": 10,
+   "categories": [
+    "abstract/other"
+   ],
+   "types": {
+    "shape": 4,
+    "blend": 3,
+    "transform": 1,
+    "colorize": 1
+   },
+   "channels": {
+    "albedo": "colorize(blend(blend(blend,transform),shape))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao_light_affect": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal_scale": 1,
+    "resolution": 1,
+    "roughness": 1,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "shape_3",
+     "type": "shape",
+     "parameters": {
+      "edge": 0.05,
+      "radius": 0.18,
+      "shape": 0,
+      "sides": 3
+     }
+    },
+    {
+     "name": "shape_0",
+     "type": "shape",
+     "parameters": {
+      "edge": 0.02,
+      "radius": 0.5,
+      "shape": 4,
+      "sides": 3
+     }
+    },
+    {
+     "name": "shape_1",
+     "type": "shape",
+     "parameters": {
+      "edge": 0.02,
+      "radius": 0.87,
+      "shape": 0,
+      "sides": 3
+     }
+    },
+    {
+     "name": "shape_2",
+     "type": "shape",
+     "parameters": {
+      "edge": 0.02,
+      "radius": 0.34,
+      "shape": 0,
+      "sides": 3
+     }
+    },
+    {
+     "name": "transform_0",
+     "type": "transform",
+     "parameters": {
+      "repeat": true,
+      "rotate": 30,
+      "scale_x": 1,
+      "scale_y": 1,
+      "translate_x": 0,
+      "translate_y": 0
+     }
+    }
+   ]
+  },
+  "raymarching": {
+   "nodes": 9,
+   "categories": [
+    "abstract/other"
+   ],
+   "types": {
+    "shader": 4,
+    "sdrhombus": 1,
+    "sdboolean": 1,
+    "raymarching": 1,
+    "uniform": 1
+   },
+   "channels": {
+    "normal": "raymarching(shader(shader(shader)))",
+    "albedo": "uniform",
+    "metallic": "uniform"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao_light_affect": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal_scale": 1,
+    "roughness": 1,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "sdrotate",
+     "type": "shader",
+     "parameters": {
+      "a": 0,
+      "ax": 18,
+      "ay": -28,
+      "az": -29,
+      "x": 0.35,
+      "y": 0,
+      "z": 0
+     }
+    },
+    {
+     "name": "sdrhombus_2",
+     "type": "sdrhombus",
+     "parameters": {
+      "cx": 0,
+      "cy": 0,
+      "h": 0.29,
+      "r": 0.3,
+      "w": 0.3
+     }
+    },
+    {
+     "name": "sdbox",
+     "type": "shader",
+     "parameters": {
+      "cx": 0,
+      "cy": 0,
+      "h": 0.2,
+      "r": 0.3,
+      "w": 0.2
+     }
+    },
+    {
+     "name": "sdboolean",
+     "type": "sdboolean",
+     "parameters": {
+      "bevel": 0,
+      "cx": 0,
+      "cy": 0,
+      "h": 0.08,
+      "op": 0,
+      "r": 0.3,
+      "w": 0.28
+     }
+    },
+    {
+     "name": "_4_2_3",
+     "type": "shader",
+     "parameters": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+     }
+    },
+    {
+     "name": "sdf3d_revolution",
+     "type": "shader",
+     "parameters": {
+      "a": 0,
+      "d": 0.43,
+      "s": 1,
+      "x": 0.35,
+      "y": 0,
+      "z": 0
+     }
+    },
+    {
+     "name": "raymarching",
+     "type": "raymarching",
+     "parameters": {}
+    }
+   ]
+  },
+  "rock": {
+   "nodes": 11,
+   "categories": [
+    "stone"
+   ],
+   "types": {
+    "normal_map": 1,
+    "colorize": 3,
+    "perlin": 2,
+    "voronoi": 2,
+    "warp": 1,
+    "blend": 1
+   },
+   "channels": {
+    "albedo": "colorize(blend(voronoi\u00d72,perlin))",
+    "normal": "normal_map(warp(voronoi,perlin))",
+    "metallic": "colorize(perlin)",
+    "roughness": "colorize(perlin)"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao_light_affect": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal_scale": 1,
+    "resolution": 1,
+    "roughness": 1,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "perlin_0",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 6,
+      "persistence": 0.85,
+      "scale_x": 4,
+      "scale_y": 4
+     }
+    },
+    {
+     "name": "perlin_1",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 3,
+      "persistence": 0.65,
+      "scale_x": 4,
+      "scale_y": 4
+     }
+    },
+    {
+     "name": "voronoi_1",
+     "type": "voronoi",
+     "parameters": {
+      "intensity": 0.85,
+      "randomness": 1,
+      "scale_x": 4,
+      "scale_y": 4,
+      "stretch_x": 1,
+      "stretch_y": 1
+     }
+    },
+    {
+     "name": "warp_0",
+     "type": "warp",
+     "parameters": {
+      "amount": 0.3,
+      "eps": 0.045,
+      "epsilon": 0
+     }
+    },
+    {
+     "name": "voronoi_0",
+     "type": "voronoi",
+     "parameters": {
+      "intensity": 1,
+      "randomness": 1,
+      "scale_x": 4,
+      "scale_y": 4,
+      "stretch_x": 1,
+      "stretch_y": 1
+     }
+    }
+   ]
+  },
+  "rusted_metal": {
+   "nodes": 11,
+   "categories": [
+    "metal"
+   ],
+   "types": {
+    "perlin": 3,
+    "colorize": 5,
+    "blend": 2
+   },
+   "channels": {
+    "albedo": "blend(colorize(perlin)\u00d73)",
+    "metallic": "colorize(perlin)",
+    "roughness": "blend(colorize(colorize(perlin)),colorize(perlin))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal": 1,
+    "roughness": 1,
+    "size": 11,
+    "sss": 0
+   },
+   "key_nodes": [
+    {
+     "name": "perlin_0",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 8,
+      "persistence": 0.7,
+      "scale_x": 4,
+      "scale_y": 4
+     }
+    },
+    {
+     "name": "perlin_1",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 8,
+      "persistence": 0.8,
+      "scale_x": 4,
+      "scale_y": 4
+     }
+    },
+    {
+     "name": "perlin_2",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 8,
+      "persistence": 0.9,
+      "scale_x": 4,
+      "scale_y": 4
+     }
+    }
+   ]
+  },
+  "skulls": {
+   "nodes": 19,
+   "categories": [
+    "organic"
+   ],
+   "types": {
+    "perlin": 1,
+    "colorize": 6,
+    "uniform_greyscale": 1,
+    "occlusion": 1,
+    "blend": 3,
+    "sdf3d_boolean": 1,
+    "normal_map": 1,
+    "buffer": 1,
+    "raymarching": 1,
+    "graph": 2
+   },
+   "channels": {
+    "metallic": "uniform_greyscale",
+    "depth": "colorize(buffer(raymarching(sdf3d_boolean)))",
+    "ao": "occlusion(buffer(raymarching(sdf3d_boolean)))",
+    "albedo": "blend(colorize(perlin)\u00d72,colorize(buffer(raymarching)))",
+    "normal": "blend(raymarching(sdf3d_boolean(graph\u00d72)),normal_map(perlin),colorize(buffer(raymarching)))",
+    "roughness": "blend(colorize(perlin),colorize(buffer(raymarching)))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal": 1,
+    "roughness": 1,
+    "size": 11,
+    "sss": 0
+   },
+   "key_nodes": [
+    {
+     "name": "perlin",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 5,
+      "persistence": 0.7,
+      "scale_x": 32,
+      "scale_y": 32
+     }
+    },
+    {
+     "name": "occlusion",
+     "type": "occlusion",
+     "parameters": {
+      "param0": 10,
+      "param2": 15
+     }
+    },
+    {
+     "name": "sdf3d_boolean_2_2",
+     "type": "sdf3d_boolean",
+     "parameters": {
+      "op": 0
+     }
+    },
+    {
+     "name": "buffer",
+     "type": "buffer",
+     "parameters": {
+      "lod": 0,
+      "size": 11
+     }
+    },
+    {
+     "name": "raymarching",
+     "type": "raymarching",
+     "parameters": {}
+    }
+   ]
+  },
+  "splatter": {
+   "nodes": 24,
+   "categories": [
+    "abstract/other"
+   ],
+   "types": {
+    "remote": 1,
+    "blend": 4,
+    "normal_map": 1,
+    "shape": 1,
+    "graph": 4,
+    "colorize": 5,
+    "perlin": 1,
+    "pattern": 2,
+    "transform": 2,
+    "mirror": 1,
+    "tiler": 1
+   },
+   "channels": {
+    "normal": "normal_map(tiler(blend(shape,graph),colorize(perlin)))",
+    "depth": "colorize(tiler(blend(shape,graph),colorize(perlin)))",
+    "albedo": "colorize(tiler(blend(shape,graph),colorize(perlin)))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao_light_affect": 1,
+    "depth_scale": 0.1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal_scale": 1,
+    "roughness": 1,
+    "size": 12,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "_2",
+     "type": "remote",
+     "parameters": {}
+    },
+    {
+     "name": "shape",
+     "type": "shape",
+     "parameters": {
+      "edge": 0.052,
+      "radius": 0.03,
+      "shape": 3,
+      "sides": 5
+     }
+    },
+    {
+     "name": "perlin",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 2,
+      "persistence": 0.5,
+      "scale_x": 8,
+      "scale_y": 8
+     }
+    },
+    {
+     "name": "pattern",
+     "type": "pattern",
+     "parameters": {
+      "mix": 0,
+      "x_scale": 1,
+      "x_wave": 1,
+      "y_scale": 1,
+      "y_wave": 0
+     }
+    },
+    {
+     "name": "transform",
+     "type": "transform",
+     "parameters": {
+      "repeat": false,
+      "rotate": 0,
+      "scale_x": 0.335,
+      "scale_y": 1.43,
+      "translate_x": 0,
+      "translate_y": 0
+     }
+    },
+    {
+     "name": "pattern_2",
+     "type": "pattern",
+     "parameters": {
+      "mix": 0,
+      "x_scale": 48,
+      "x_wave": 1,
+      "y_scale": 1,
+      "y_wave": 4
+     }
+    },
+    {
+     "name": "transform_2",
+     "type": "transform",
+     "parameters": {
+      "repeat": true,
+      "rotate": 45,
+      "scale_x": 1,
+      "scale_y": 1,
+      "translate_x": 0,
+      "translate_y": 0
+     }
+    },
+    {
+     "name": "mirror",
+     "type": "mirror",
+     "parameters": {
+      "direction": 0,
+      "offset": 0
+     }
+    },
+    {
+     "name": "tiler",
+     "type": "tiler",
+     "parameters": {
+      "offset": 0.6,
+      "overlap": 1,
+      "rotate": 45,
+      "scale": 0.2,
+      "select_inputs": 0,
+      "tx": 24,
+      "ty": 24
+     }
+    }
+   ]
+  },
+  "stone_wall": {
+   "nodes": 17,
+   "categories": [
+    "stone"
+   ],
+   "types": {
+    "colorize": 6,
+    "perlin": 2,
+    "blend": 3,
+    "uniform": 1,
+    "normal_map": 1,
+    "warp": 1,
+    "bricks": 1,
+    "shader": 1
+   },
+   "channels": {
+    "metallic": "uniform",
+    "albedo": "blend(colorize(blend(perlin,bricks)),colorize(perlin),colorize(warp(bricks,perlin)))",
+    "roughness": "colorize(colorize(warp(bricks,perlin)))",
+    "ao": "colorize(blend(warp(bricks,perlin),perlin))",
+    "normal": "normal_map(blend(warp(bricks,perlin),perlin))",
+    "depth": "colorize(blend(warp(bricks,perlin),perlin))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao": 1,
+    "depth_scale": 0.2,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal": 1,
+    "roughness": 1,
+    "size": 11,
+    "sss": 0
+   },
+   "key_nodes": [
+    {
+     "name": "perlin_0",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 4,
+      "persistence": 0.75,
+      "scale_x": 4,
+      "scale_y": 4
+     }
+    },
+    {
+     "name": "Perlin",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 8,
+      "persistence": 0.8,
+      "scale_x": 4,
+      "scale_y": 4
+     }
+    },
+    {
+     "name": "Warp",
+     "type": "warp",
+     "parameters": {
+      "amount": 0.05,
+      "eps": 0.05
+     }
+    },
+    {
+     "name": "Bricks",
+     "type": "bricks",
+     "parameters": {
+      "bevel": 0.15,
+      "columns": 3,
+      "corner": 0,
+      "mortar": 0.05,
+      "pattern": 0,
+      "repeat": 1,
+      "round": 0,
+      "row_offset": 0.5,
+      "rows": 6
+     }
+    },
+    {
+     "name": "394",
+     "type": "shader",
+     "parameters": {
+      "ambient": 0.29,
+      "lx": 0.49,
+      "ly": 0.5,
+      "lz": -1
+     }
+    }
+   ]
+  },
+  "stylized_wall": {
+   "nodes": 24,
+   "categories": [
+    "stone"
+   ],
+   "types": {
+    "bricks": 2,
+    "transform2": 1,
+    "decompose": 1,
+    "fbm": 1,
+    "normal_map": 1,
+    "invert": 1,
+    "colorize": 5,
+    "graph": 6,
+    "blend": 3,
+    "buffer": 1,
+    "uniform": 1
+   },
+   "channels": {
+    "normal": "normal_map(blend(colorize(graph),graph(graph)))",
+    "depth": "invert(blend(colorize(graph),graph(graph)))",
+    "albedo": "blend(colorize(graph(bricks)),blend(graph(bricks),uniform,colorize(graph)),colorize(graph(bricks)))",
+    "ao": "colorize(blend(colorize(graph),graph(graph)))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao": 1,
+    "depth_scale": 0.1,
+    "emission_energy": 1,
+    "flags_transparent": false,
+    "metallic": 0,
+    "normal": 1,
+    "roughness": 1,
+    "size": 11,
+    "sss": 0
+   },
+   "key_nodes": [
+    {
+     "name": "bricks",
+     "type": "bricks",
+     "parameters": {
+      "bevel": 0,
+      "columns": 3,
+      "corner": 0.42,
+      "mortar": 0,
+      "pattern": 0,
+      "repeat": 2,
+      "round": 0,
+      "row_offset": 0.5,
+      "rows": 6
+     }
+    },
+    {
+     "name": "bricks_2",
+     "type": "bricks",
+     "parameters": {
+      "bevel": 0.39,
+      "columns": 3,
+      "corner": 0,
+      "mortar": 0,
+      "pattern": 0,
+      "repeat": 2,
+      "round": 0.4,
+      "row_offset": 0.5,
+      "rows": 6
+     }
+    },
+    {
+     "name": "transform2",
+     "type": "transform2",
+     "parameters": {
+      "mode": 1,
+      "rotate": 0,
+      "scale_x": 1,
+      "scale_y": 1,
+      "translate_x": 1,
+      "translate_y": 1
+     }
+    },
+    {
+     "name": "decompose",
+     "type": "decompose",
+     "parameters": {}
+    },
+    {
+     "name": "fbm",
+     "type": "fbm",
+     "parameters": {
+      "iterations": 2,
+      "noise": 1,
+      "persistence": 0.38,
+      "scale_x": 4,
+      "scale_y": 4
+     }
+    },
+    {
+     "name": "invert",
+     "type": "invert",
+     "parameters": {}
+    },
+    {
+     "name": "buffer",
+     "type": "buffer",
+     "parameters": {
+      "lod": 0,
+      "size": 11
+     }
+    }
+   ]
+  },
+  "tiles": {
+   "nodes": 14,
+   "categories": [
+    "tiles/floor"
+   ],
+   "types": {
+    "shape": 1,
+    "transform": 3,
+    "pattern": 1,
+    "blend": 4,
+    "bricks": 1,
+    "colorize": 2,
+    "normal_map": 1
+   },
+   "channels": {
+    "normal": "normal_map(blend(transform(blend),transform(transform)))",
+    "albedo": "colorize(blend(transform(bricks),bricks,colorize(blend)))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao_light_affect": 1,
+    "depth_scale": 1,
+    "emission_energy": 0.45,
+    "metallic": 1,
+    "normal_scale": 2.15,
+    "roughness": 1,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "shape",
+     "type": "shape",
+     "parameters": {
+      "edge": 0.062,
+      "radius": 1,
+      "shape": 0,
+      "sides": 6
+     }
+    },
+    {
+     "name": "transform",
+     "type": "transform",
+     "parameters": {
+      "repeat": true,
+      "rotate": 0,
+      "scale_x": 0.125,
+      "scale_y": 0.125,
+      "translate_x": 0,
+      "translate_y": 0
+     }
+    },
+    {
+     "name": "pattern",
+     "type": "pattern",
+     "parameters": {
+      "mix": 0,
+      "x_scale": 2,
+      "x_wave": 4,
+      "y_scale": 1,
+      "y_wave": 3
+     }
+    },
+    {
+     "name": "transform_2",
+     "type": "transform",
+     "parameters": {
+      "repeat": true,
+      "rotate": 0,
+      "scale_x": 1,
+      "scale_y": 1,
+      "translate_x": 0.06,
+      "translate_y": 0.06
+     }
+    },
+    {
+     "name": "bricks",
+     "type": "bricks",
+     "parameters": {
+      "bevel": 0,
+      "columns": 8,
+      "corner": 0,
+      "mortar": 0.1,
+      "pattern": 0,
+      "repeat": 1,
+      "round": 0,
+      "row_offset": 0,
+      "rows": 8
+     }
+    },
+    {
+     "name": "transform_2_2",
+     "type": "transform",
+     "parameters": {
+      "repeat": true,
+      "rotate": 0,
+      "scale_x": 1,
+      "scale_y": 1,
+      "translate_x": 0.56,
+      "translate_y": 0.56
+     }
+    }
+   ]
+  },
+  "wood": {
+   "nodes": 12,
+   "categories": [
+    "wood"
+   ],
+   "types": {
+    "perlin": 3,
+    "warp": 2,
+    "colorize": 3,
+    "voronoi": 1,
+    "blend": 1,
+    "normal_map": 1
+   },
+   "channels": {
+    "normal": "normal_map(blend(perlin,warp(warp,colorize)))",
+    "roughness": "colorize(blend(perlin,warp(warp,colorize)))",
+    "metallic": "blend(perlin,warp(warp(perlin\u00d72),colorize(voronoi)))",
+    "albedo": "colorize(blend(perlin,warp(warp,colorize)))"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao_light_affect": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal_scale": 1,
+    "roughness": 1,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "perlin_2",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 6,
+      "persistence": 1,
+      "scale_x": 32,
+      "scale_y": 4
+     }
+    },
+    {
+     "name": "perlin_1",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 3,
+      "persistence": 0.5,
+      "scale_x": 4,
+      "scale_y": 4
+     }
+    },
+    {
+     "name": "perlin_0",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 3,
+      "persistence": 0.5,
+      "scale_x": 32,
+      "scale_y": 4
+     }
+    },
+    {
+     "name": "warp_0",
+     "type": "warp",
+     "parameters": {
+      "amount": 0.1,
+      "eps": 0.05
+     }
+    },
+    {
+     "name": "warp_1",
+     "type": "warp",
+     "parameters": {
+      "amount": 0.1,
+      "eps": 0.045
+     }
+    },
+    {
+     "name": "voronoi_0",
+     "type": "voronoi",
+     "parameters": {
+      "intensity": 1,
+      "randomness": 1,
+      "scale_x": 5,
+      "scale_y": 4,
+      "stretch_x": 1,
+      "stretch_y": 1
+     }
+    }
+   ]
+  },
+  "wood_with_blood": {
+   "nodes": 16,
+   "categories": [
+    "wood"
+   ],
+   "types": {
+    "colorize": 4,
+    "bricks": 1,
+    "perlin": 3,
+    "blend": 3,
+    "normal_map": 1,
+    "uniform": 2,
+    "combine": 1
+   },
+   "channels": {
+    "normal": "normal_map(blend(bricks,perlin))",
+    "albedo": "blend(colorize(perlin),colorize(blend(bricks,perlin)),colorize(perlin))",
+    "roughness": "blend(colorize(perlin),uniform)",
+    "metallic": "uniform"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao_light_affect": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal_scale": 1,
+    "resolution": 1,
+    "roughness": 1,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "bricks_0",
+     "type": "bricks",
+     "parameters": {
+      "bevel": 0.008,
+      "columns": 5,
+      "corner": 0,
+      "mortar": 0.025,
+      "pattern": 0,
+      "repeat": 1,
+      "round": 0,
+      "row_offset": 0.5,
+      "rows": 1
+     }
+    },
+    {
+     "name": "perlin_1",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 7,
+      "persistence": 0.55,
+      "scale_x": 4,
+      "scale_y": 4
+     }
+    },
+    {
+     "name": "perlin_2",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 6,
+      "persistence": 0.65,
+      "scale_x": 4,
+      "scale_y": 4
+     }
+    },
+    {
+     "name": "combine_0",
+     "type": "combine",
+     "parameters": {
+      "color": "#ffffff",
+      "name": 0
+     }
+    },
+    {
+     "name": "perlin_0",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 6,
+      "persistence": 0.7,
+      "scale_x": 20,
+      "scale_y": 3
+     }
+    }
+   ]
+  },
+  "wooden_floor": {
+   "nodes": 10,
+   "categories": [
+    "wood",
+    "tiles/floor"
+   ],
+   "types": {
+    "colorize": 1,
+    "normal_map": 1,
+    "uniform": 1,
+    "combine": 1,
+    "perlin": 1,
+    "decompose": 1,
+    "bricks": 1,
+    "transform": 1,
+    "blend": 1
+   },
+   "channels": {
+    "albedo": "blend(colorize(bricks),transform(perlin,decompose(bricks)\u00d72))",
+    "normal": "normal_map(blend(colorize(bricks),transform(perlin,decompose\u00d72)))",
+    "roughness": "blend(colorize(bricks),transform(perlin,decompose(bricks)\u00d72))",
+    "metallic": "uniform"
+   },
+   "material": {
+    "albedo_color": "#ffffff",
+    "ao_light_affect": 1,
+    "depth_scale": 1,
+    "emission_energy": 1,
+    "metallic": 1,
+    "normal_scale": 1,
+    "resolution": 1,
+    "roughness": 1,
+    "size": 11,
+    "subsurf_scatter_strength": 0
+   },
+   "key_nodes": [
+    {
+     "name": "combine_0",
+     "type": "combine",
+     "parameters": {
+      "color": "#ffffff",
+      "name": 0
+     }
+    },
+    {
+     "name": "perlin_0",
+     "type": "perlin",
+     "parameters": {
+      "iterations": 6,
+      "persistence": 0.75,
+      "scale_x": 4,
+      "scale_y": 20
+     }
+    },
+    {
+     "name": "decompose_0",
+     "type": "decompose",
+     "parameters": {}
+    },
+    {
+     "name": "bricks_0",
+     "type": "bricks",
+     "parameters": {
+      "bevel": 0,
+      "columns": 1,
+      "corner": 0,
+      "mortar": 0.02,
+      "pattern": 0,
+      "repeat": 1,
+      "round": 0,
+      "row_offset": 0.5,
+      "rows": 10
+     }
+    },
+    {
+     "name": "transform_1",
+     "type": "transform",
+     "parameters": {
+      "repeat": true,
+      "rotate": 0,
+      "scale_x": 1,
+      "scale_y": 1,
+      "translate_x": 1,
+      "translate_y": 1
+     }
+    }
+   ]
+  }
+ },
+ "type_count": {
+  "transform": 27,
+  "graph": 42,
+  "colorize": 138,
+  "blend": 73,
+  "edge_detect_1": 1,
+  "box": 1,
+  "sphere": 1,
+  "normal_map": 31,
+  "uniform_greyscale": 5,
+  "beehive": 1,
+  "pattern": 18,
+  "combine": 4,
+  "uniform": 29,
+  "bricks": 11,
+  "perlin": 38,
+  "warp": 7,
+  "adjust_hsv": 1,
+  "remote": 3,
+  "voronoi": 10,
+  "shader": 15,
+  "sdf3d_extrusion": 1,
+  "sdf3d_cylinder": 1,
+  "shape": 19,
+  "tex3d_pattern": 1,
+  "tex3d_fbm": 1,
+  "sdf3d_elongation": 1,
+  "sdf3d_torus": 1,
+  "fbm": 2,
+  "splatter": 2,
+  "tile2x2": 1,
+  "splatter_color": 1,
+  "tiler_color": 1,
+  "fill_to_random_grey": 1,
+  "fill_to_random_color": 1,
+  "fill_to_uv": 1,
+  "fill_to_position": 1,
+  "fill_to_size": 1,
+  "image": 1,
+  "colormap": 1,
+  "fbm2": 1,
+  "perlin_color": 2,
+  "morphology2": 1,
+  "material_unlit": 1,
+  "tones_range": 1,
+  "mirror": 3,
+  "translate": 4,
+  "rotate": 2,
+  "math": 6,
+  "tiler": 2,
+  "transform2": 6,
+  "scale": 1,
+  "debug": 1,
+  "kaleidoscope": 1,
+  "invert": 2,
+  "mwf_map": 7,
+  "mwf_mix": 9,
+  "mwf_output": 7,
+  "switch": 1,
+  "mwf_create_map": 8,
+  "mwf_mix_maps": 1,
+  "brightness_contrast": 1,
+  "mul_detect": 3,
+  "sdf3d_repeat": 6,
+  "sdf3d_scale": 1,
+  "sdf3d_boolean": 4,
+  "sdf3d_translate": 4,
+  "raymarching": 3,
+  "occlusion": 2,
+  "sdrhombus": 1,
+  "sdboolean": 1,
+  "buffer": 2,
+  "decompose": 2
+ },
+ "successors": {
+  "graph": {
+   "material": 5,
+   "edge_detect_1": 1,
+   "warp": 1,
+   "blend": 9,
+   "shape": 1,
+   "transform": 4,
+   "graph": 5,
+   "invert": 1,
+   "mwf_map": 12,
+   "mwf_mix": 2,
+   "switch": 12,
+   "mwf_create_map": 5,
+   "colorize": 5,
+   "shader": 1,
+   "sdf3d_scale": 1,
+   "sdf3d_boolean": 2,
+   "buffer": 1
+  },
+  "transform": {
+   "blend": 21,
+   "colorize": 8,
+   "normal_map": 1,
+   "transform": 4
+  },
+  "blend": {
+   "graph": 1,
+   "colorize": 32,
+   "normal_map": 14,
+   "blend": 20,
+   "transform": 5,
+   "material": 24,
+   "mwf_create_map": 1,
+   "mirror": 1,
+   "tiler": 1,
+   "shader": 1,
+   "invert": 1,
+   "combine": 2
+  },
+  "edge_detect_1": {
+   "colorize": 1
+  },
+  "colorize": {
+   "material": 53,
+   "blend": 67,
+   "transform": 6,
+   "combine": 1,
+   "colorize": 8,
+   "adjust_hsv": 1,
+   "normal_map": 10,
+   "tile2x2": 4,
+   "splatter": 1,
+   "warp": 2,
+   "graph": 2,
+   "mwf_map": 2,
+   "tiler": 1,
+   "transform2": 1
+  },
+  "box": {
+   "blend": 1
+  },
+  "sphere": {
+   "transform": 1
+  },
+  "beehive": {
+   "colorize": 2
+  },
+  "uniform_greyscale": {
+   "material": 2,
+   "mwf_mix": 2,
+   "mwf_output": 1
+  },
+  "normal_map": {
+   "material": 26,
+   "blend": 4,
+   "mwf_map": 1,
+   "brightness_contrast": 1,
+   "shader": 1
+  },
+  "pattern": {
+   "colorize": 10,
+   "transform": 5,
+   "blend": 3
+  },
+  "combine": {
+   "material": 1,
+   "material_unlit": 1,
+   "scale": 1
+  },
+  "uniform": {
+   "material": 16,
+   "blend": 5,
+   "mwf_map": 7,
+   "mwf_mix": 2,
+   "combine": 2
+  },
+  "bricks": {
+   "transform": 4,
+   "blend": 7,
+   "normal_map": 1,
+   "colorize": 5,
+   "warp": 1,
+   "decompose": 2,
+   "graph": 5
+  },
+  "perlin": {
+   "warp": 7,
+   "blend": 13,
+   "colorize": 32,
+   "normal_map": 2,
+   "transform2": 1,
+   "transform": 4
+  },
+  "warp": {
+   "colorize": 6,
+   "blend": 5,
+   "normal_map": 2,
+   "warp": 1
+  },
+  "adjust_hsv": {
+   "blend": 1
+  },
+  "voronoi": {
+   "colorize": 12,
+   "blend": 4,
+   "warp": 2,
+   "transform": 1
+  },
+  "tex3d_fbm": {
+   "shader": 1
+  },
+  "tex3d_pattern": {
+   "shader": 1
+  },
+  "shader": {
+   "shader": 6,
+   "colorize": 1,
+   "mul_detect": 6,
+   "sdf3d_repeat": 2,
+   "material": 1,
+   "sdboolean": 1,
+   "raymarching": 1
+  },
+  "sdf3d_elongation": {
+   "shader": 1
+  },
+  "sdf3d_torus": {
+   "sdf3d_elongation": 1
+  },
+  "shape": {
+   "colorize": 7,
+   "tones_range": 1,
+   "mirror": 2,
+   "translate": 1,
+   "blend": 5,
+   "transform": 1
+  },
+  "tile2x2": {
+   "splatter": 1,
+   "splatter_color": 1,
+   "tiler_color": 1
+  },
+  "tiler_color": {
+   "material": 1
+  },
+  "colormap": {
+   "graph": 1
+  },
+  "fbm2": {
+   "colormap": 1,
+   "graph": 1
+  },
+  "perlin_color": {
+   "colormap": 1,
+   "graph": 1
+  },
+  "mirror": {
+   "translate": 2,
+   "colorize": 1
+  },
+  "translate": {
+   "rotate": 2,
+   "math": 1,
+   "kaleidoscope": 1
+  },
+  "rotate": {
+   "math": 2
+  },
+  "math": {
+   "math": 4,
+   "tiler": 1,
+   "transform2": 1
+  },
+  "tones_range": {
+   "math": 1
+  },
+  "transform2": {
+   "transform2": 4,
+   "combine": 3,
+   "math": 1,
+   "bricks": 1
+  },
+  "scale": {
+   "debug": 1
+  },
+  "tiler": {
+   "translate": 1,
+   "transform2": 1,
+   "normal_map": 1,
+   "colorize": 2
+  },
+  "kaleidoscope": {
+   "math": 1
+  },
+  "mwf_map": {
+   "mwf_mix": 35
+  },
+  "invert": {
+   "mwf_map": 1,
+   "material": 1
+  },
+  "mwf_mix": {
+   "mwf_mix": 15,
+   "mwf_output": 30
+  },
+  "mwf_output": {
+   "material": 27
+  },
+  "switch": {
+   "mwf_output": 4
+  },
+  "mwf_mix_maps": {
+   "mwf_map": 1
+  },
+  "mwf_create_map": {
+   "mwf_mix_maps": 4,
+   "mwf_map": 4
+  },
+  "mul_detect": {
+   "mwf_create_map": 3
+  },
+  "sdf3d_repeat": {
+   "shader": 2,
+   "sdf3d_boolean": 2,
+   "sdf3d_translate": 2
+  },
+  "sdf3d_scale": {
+   "sdf3d_repeat": 4
+  },
+  "sdf3d_translate": {
+   "sdf3d_boolean": 3,
+   "raymarching": 1
+  },
+  "sdf3d_boolean": {
+   "sdf3d_boolean": 1,
+   "sdf3d_translate": 2,
+   "raymarching": 1
+  },
+  "raymarching": {
+   "material": 2,
+   "colorize": 1,
+   "occlusion": 1,
+   "buffer": 1,
+   "blend": 1
+  },
+  "occlusion": {
+   "material": 2
+  },
+  "sdrhombus": {
+   "sdboolean": 1
+  },
+  "sdboolean": {
+   "shader": 1
+  },
+  "buffer": {
+   "colorize": 3,
+   "occlusion": 1,
+   "graph": 1
+  },
+  "decompose": {
+   "transform2": 2,
+   "transform": 2
+  },
+  "fbm": {
+   "colorize": 1
+  },
+  "remote": {},
+  "splatter": {},
+  "sdf3d_extrusion": {},
+  "sdf3d_cylinder": {}
+ }
+}

@@ -873,6 +873,226 @@ func op_screenshot(args : Dictionary) -> Dictionary:
 		return _err("Cannot write '%s'" % out)
 	return { ok = true, path = out, width = image.get_width(), height = image.get_height() }
 
+# Examples ---------------------------------------------------------------------------------
+# The example projects shipped with Material Maker, as a library to learn from and to borrow
+# node chains from. They are read as plain data; only `show_example` with a render instantiates one.
+
+const EXAMPLE_DIRS : Array = ["res://material_maker/examples"]
+const CHANNELS : Array = ["albedo", "metallic", "roughness", "emission", "normal", "ao", "depth", "opacity", "sss"]
+
+var _example_cache : Dictionary = {}
+
+func _example_dirs() -> Array:
+	var dirs : Array = EXAMPLE_DIRS.duplicate()
+	dirs.append(OS.get_executable_path().get_base_dir().path_join("examples"))   # exported builds ship them beside the exe
+	return dirs
+
+func _example_names() -> Array:
+	var names : Array = []
+	for d in _example_dirs():
+		var dir : DirAccess = DirAccess.open(d)
+		if dir == null:
+			continue
+		for f in dir.get_files():
+			if f.get_extension() == "ptex" and f.get_basename() not in names:
+				names.append(f.get_basename())
+	names.sort()
+	return names
+
+func _load_example(example_name : String) -> Dictionary:
+	if _example_cache.has(example_name):
+		return _example_cache[example_name]
+	for d in _example_dirs():
+		var file_path : String = d.path_join(example_name + ".ptex")
+		if FileAccess.file_exists(file_path):
+			var f : FileAccess = FileAccess.open(file_path, FileAccess.READ)
+			var data : Dictionary = mm_loader.string_to_dict_tree(f.get_as_text())
+			if not data.is_empty():
+				_example_cache[example_name] = data
+				return data
+	return {}
+
+static func _raw_type(n : Dictionary) -> String:
+	if n.has("type") and str(n.type) != "":
+		return str(n.type)
+	if n.has("nodes"):
+		return "graph"
+	if n.has("shader_model") and n.shader_model is Dictionary:
+		return "shader:" + str(n.shader_model.get("name", "?"))
+	return "?"
+
+# Graph dictionary inside an example, following a path of subgraph names ("" = top level)
+func _example_graph(data : Dictionary, graph_path : String) -> Dictionary:
+	var g : Dictionary = data
+	if graph_path == "" or graph_path == ".":
+		return g
+	for part in graph_path.split("/"):
+		var found : bool = false
+		for n in g.get("nodes", []):
+			if str(n.get("name", "")) == part and n.has("nodes"):
+				g = n
+				found = true
+				break
+		if not found:
+			return {}
+	return g
+
+func _channel_sources(g : Dictionary) -> Dictionary:
+	var rv : Dictionary = {}
+	var types : Dictionary = {}
+	for n in g.get("nodes", []):
+		types[str(n.get("name", ""))] = _raw_type(n)
+	for c in g.get("connections", []):
+		if types.get(str(c.to), "") == "material" and int(c.to_port) < CHANNELS.size():
+			rv[CHANNELS[int(c.to_port)]] = "%s:%s" % [c.from, types.get(str(c.from), "?")]
+	return rv
+
+func op_list_examples(args : Dictionary) -> Dictionary:
+	var filter : String = str(args.get("filter", "")).to_lower()
+	var query_words : Array = filter.split(" ", false)
+	var rv : Array = []
+	for example_name in _example_names():
+		var data : Dictionary = _load_example(example_name)
+		var counts : Dictionary = {}
+		for n in data.get("nodes", []):
+			var t : String = _raw_type(n)
+			counts[t] = counts.get(t, 0) + 1
+		var haystack : String = example_name.to_lower() + " " + " ".join(counts.keys())
+		var matches : bool = true
+		for w in query_words:
+			if w not in haystack:
+				matches = false
+		if not matches:
+			continue
+		var top : Array = counts.keys()
+		top.sort_custom(func(a, b): return counts[a] > counts[b])
+		var channels : Dictionary = _channel_sources(data)
+		rv.append({ name = example_name, nodes = data.get("nodes", []).size(), main_types = top.filter(func(t): return t not in ["material", "comment"]).slice(0, 6), channels = channels.keys() })
+	return { count = rv.size(), examples = rv }
+
+func op_show_example(args : Dictionary) -> Dictionary:
+	var example_name : String = str(args.get("name", ""))
+	var data : Dictionary = _load_example(example_name)
+	if data.is_empty():
+		var close : Array = _example_names().filter(func(n): return example_name != "" and (example_name in n or n in example_name))
+		return _err("Unknown example '%s'" % example_name, { suggestions = close.slice(0, 8), hint = "use list_examples" })
+	var graph_path : String = str(args.get("graph", ""))
+	var g : Dictionary = _example_graph(data, graph_path)
+	if g.is_empty():
+		return _err("Graph '%s' not found in example '%s'" % [graph_path, example_name])
+	var nodes : Array = []
+	for n in g.get("nodes", []):
+		var item : Dictionary = { name = n.get("name", ""), type = _raw_type(n) }
+		if item.type == "comment":
+			item.text = str(n.get("text", ""))
+		if n.has("nodes"):
+			item.children = n.nodes.size()
+		var params : Dictionary = {}
+		for k in n.get("parameters", {}).keys():
+			var v = jsonable(MMType.deserialize_value(n.parameters[k]))
+			if v is Dictionary and v.has("points"):
+				v = "gradient(%d stops)" % v.points.size()
+			params[k] = v
+		if not params.is_empty():
+			item.parameters = params
+		item.position = [n.get("node_position", {}).get("x", 0), n.get("node_position", {}).get("y", 0)]
+		nodes.append(item)
+	var conns : Array = []
+	for c in g.get("connections", []):
+		conns.append("%s:%d -> %s:%d" % [c.from, c.from_port, c.to, c.to_port])
+	var rv : Dictionary = { name = example_name, graph = graph_path, nodes = nodes, connections = conns, material_channels = _channel_sources(g) }
+	if args.has("render") or args.has("out"):
+		var gen = await mm_loader.create_gen(data.duplicate(true))
+		if gen == null:
+			rv.render_error = "Cannot instantiate the example"
+			return rv
+		add_child(gen)
+		var saved_root : MMGenGraph = root
+		root = gen
+		var render_args : Dictionary = { size = int(args.get("size", 256)), out = str(args.get("out", "")), output = args.get("render", "albedo") }
+		if args.has("node"):
+			render_args.node = args.node
+		var r : Dictionary = await op_render(render_args)
+		root = saved_root
+		remove_child(gen)
+		gen.queue_free()
+		rv.render = r
+	return rv
+
+func op_import_from_example(args : Dictionary) -> Dictionary:
+	if not _has_project():
+		return _err("No project is open (use new_project or open)")
+	var example_name : String = str(args.get("example", ""))
+	var data : Dictionary = _load_example(example_name)
+	if data.is_empty():
+		return _err("Unknown example '%s' (use list_examples)" % example_name)
+	var src : Dictionary = _example_graph(data, str(args.get("from_graph", "")))
+	if src.is_empty():
+		return _err("Graph '%s' not found in example '%s'" % [str(args.get("from_graph", "")), example_name])
+	var dest : MMGenGraph = _graph_at(str(args.get("graph", "")))
+	if dest == null:
+		return _err("Graph '%s' not found" % str(args.get("graph", "")))
+	var by_name : Dictionary = {}
+	for n in src.get("nodes", []):
+		by_name[str(n.get("name", ""))] = n
+	var wanted : Array = []
+	for w in args.get("nodes", []):
+		if not by_name.has(str(w)):
+			return _err("Example '%s' has no node '%s'" % [example_name, str(w)], { available = by_name.keys() })
+		if _raw_type(by_name[str(w)]) == "material":
+			return _err("The Material node cannot be imported; connect imported nodes to your own Material")
+		wanted.append(str(w))
+	if wanted.is_empty():
+		return _err("'nodes' must list at least one node name (see show_example)")
+	if bool(args.get("with_upstream", false)):
+		var i : int = 0
+		while i < wanted.size():
+			for c in src.get("connections", []):
+				if str(c.to) == wanted[i] and str(c.from) not in wanted and by_name.has(str(c.from)):
+					wanted.append(str(c.from))
+			i += 1
+	var node_data : Array = []
+	var min_x : float = INF
+	var max_x : float = -INF
+	var min_y : float = INF
+	for w in wanted:
+		var nd : Dictionary = by_name[w].duplicate(true)
+		node_data.append(nd)
+		var p : Dictionary = nd.get("node_position", {})
+		min_x = min(min_x, float(p.get("x", 0)))
+		max_x = max(max_x, float(p.get("x", 0)))
+		min_y = min(min_y, float(p.get("y", 0)))
+	var conn_data : Array = []
+	var open_inputs : Array = []
+	for c in src.get("connections", []):
+		if str(c.to) in wanted:
+			if str(c.from) in wanted:
+				conn_data.append(c.duplicate())
+			else:
+				open_inputs.append("%s:%d (was fed by %s)" % [c.to, c.to_port, c.from])
+	# put the group to the left of everything already in the graph
+	var left : float = 0.0
+	var found : bool = false
+	for ch in dest.get_children():
+		if ch is MMGenBase:
+			left = min(left, ch.position.x) if found else ch.position.x
+			found = true
+	var offset : Vector2 = Vector2((left - 450.0 - max_x) if found else -min_x, -min_y)
+	var created : Array = []
+	if is_live():
+		_show_graph(dest)
+		var ui_nodes : Array = await _ge().create_nodes({ nodes = node_data, connections = conn_data }, offset)
+		for u in ui_nodes:
+			created.append(u.generator)
+	else:
+		var result : Dictionary = await mm_loader.add_to_gen_graph(dest, node_data, conn_data, offset)
+		created = result.generators
+	var mapping : Dictionary = {}
+	for g in created:
+		mapping[str(g.orig_name) if g.orig_name != null else str(g.name)] = str(g.name)
+	dirty = true
+	return { ok = true, imported = mapping, connections = conn_data.size(), open_inputs = open_inputs }
+
 func op_batch(args : Dictionary) -> Dictionary:
 	var results : Array = []
 	for item in args.get("ops", []):
@@ -897,5 +1117,5 @@ func call_op(op : String, args : Dictionary) -> Dictionary:
 const OPERATIONS : Array = [
 	"ping", "list_node_types", "node_type_info", "new_project", "open", "save", "close", "describe", "get_node",
 	"add_node", "remove_node", "rename_node", "set_parameter", "set_parameters", "connect", "disconnect",
-	"render", "list_export_targets", "export", "screenshot", "auto_layout", "center_view", "quit_editor", "batch",
+	"render", "list_export_targets", "export", "screenshot", "auto_layout", "center_view", "quit_editor", "list_examples", "show_example", "import_from_example", "batch",
 ]

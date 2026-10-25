@@ -40,6 +40,26 @@ TOOLS = {
         "Start the Material Maker editor (needs MM_GODOT or MM_EXE) and attach to it, so the user can watch edits live. "
         "Does nothing if an editor is already open. A headless project that is open is lost.",
         {"files": dict(type="array", items=S("Project to open on start"), description=".ptex files to open")}, []),
+    "list_examples": ("list_examples",
+        "List the example projects shipped with Material Maker (wood, bricks, stone, metal, lava, ...). Each is a finished, "
+        "working graph. Filter by words matched against example names and the node types they use, e.g. 'wood', 'voronoi warp'. "
+        "Look here BEFORE building a texture from scratch.",
+        {"filter": S("Words to match against example names and node types")}, []),
+    "show_example": ("show_example",
+        "Show an example's graph: nodes with their parameter values, connections, and which node feeds each Material channel. "
+        "Pass `render` (a channel such as 'albedo', or a node name via `node`) to also see what it looks like. Subgraph nodes "
+        "can be opened with `graph`.",
+        {"name": S("Example name from list_examples"), "graph": S("Subgraph to show (default: top level)"),
+         "render": dict(description="Material channel to render ('albedo', 'normal', ...); omit for no image", type=["string", "integer"]),
+         "node": S("Render this node instead of a Material channel"), "size": I("Render size in pixels (default 256)")}, ["name"]),
+    "import_from_example": ("import_from_example",
+        "Copy nodes from an example into the open project (undoable in the live editor). Parameters are kept; connections between "
+        "the copied nodes are kept. `with_upstream` also copies everything that feeds them. Inputs that were fed from nodes you did "
+        "not copy are reported in `open_inputs` so you can wire them. Returns the new node names. The example's Material node "
+        "cannot be copied: connect the imported nodes to your own Material.",
+        {"example": S("Example name"), "nodes": dict(type="array", items=S("Node name"), description="Nodes to copy (names from show_example)"),
+         "with_upstream": B("Also copy all nodes that feed the listed ones"), "graph": GRAPH,
+         "from_graph": S("Subgraph of the example to copy from (default: top level)")}, ["example", "nodes"]),
     "list_node_types": ("list_node_types",
         "List the node types that can be added to a graph (name, label, short description). Use `filter` "
         "to search by words, e.g. 'noise', 'blur', 'brick'.",
@@ -215,6 +235,27 @@ def run_render(args):
             pass
 
 
+def run_show_example_with_image(args):
+    fd, tmp = tempfile.mkstemp(suffix=".png", prefix="mm_example_")
+    os.close(fd)
+    try:
+        result, err = call_mm("show_example", dict(args, out=tmp))
+        if err:
+            return tool_result(err, True)
+        image = None
+        render = result.get("render") or {}
+        render.pop("path", None)
+        if "error" not in render and os.path.getsize(tmp) > 0:
+            with open(tmp, "rb") as f:
+                image = base64.b64encode(f.read()).decode("ascii")
+        return tool_result(json.dumps(result, indent=1), False, image)
+    finally:
+        try:
+            os.remove(tmp)
+        except OSError:
+            pass
+
+
 def run_tool(name, arguments):
     if name not in TOOLS:
         return tool_result("Unknown tool '%s'" % name, True)
@@ -243,6 +284,8 @@ def run_tool(name, arguments):
         return tool_result("The editor did not start listening on port %d in time." % port, True)
     if name == "render":
         return run_render(args)
+    if name == "show_example" and "render" in args:
+        return run_show_example_with_image(args)
     if name == "screenshot_editor":
         fd, tmp = tempfile.mkstemp(suffix=".png", prefix="mm_shot_")
         os.close(fd)

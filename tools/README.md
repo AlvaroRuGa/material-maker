@@ -133,6 +133,28 @@ including opening and writing files, so any local program can drive your editor 
 that do not start with a JSON request (such as a web page making an HTTP request to localhost) are dropped.
 Disable it with `--no-live-server` if that is not acceptable.
 
+## Examples as a library
+
+The projects in `material_maker/examples` are exposed as tools so an agent can learn from them and reuse working node chains
+instead of starting from nothing:
+
+```sh
+python tools/mm.py examples wood                          # search by name or node types
+python tools/mm.py show-example wood --render albedo -o wood.png     # graph, parameters, channel wiring, optional render
+python tools/mm.py import-example my.ptex wood colorize_2 --upstream # copy a node and everything feeding it into a project
+```
+
+MCP tools: `list_examples`, `show_example` (returns the render as an image), `import_from_example` (undoable in live mode).
+The example's Material node is never copied; connect the imported nodes to your own Material. Inputs that were fed from nodes you did not
+copy are returned in `open_inputs`.
+
+## Claude Code skill
+
+`.claude/skills/material-maker/` teaches an agent how to use all of this: workflow, the Material input contract, verified gotchas
+(for instance that the `depth` input is inverted), and short recipes per material family (`recipes/`).
+`reference/` holds data mined from the examples; regenerate it with `python tools/mine_examples.py` after adding examples.
+Add a recipe when you have a result you are happy with (and checked by rendering), not before.
+
 ## Not covered (yet)
 
 Painting projects, a lit render of the finished material outside the editor, and brushes. Headless rendering

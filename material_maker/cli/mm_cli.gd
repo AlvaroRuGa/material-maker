@@ -37,6 +37,12 @@ Discovery
   types [filter]                           list node types
   type-info <type>                         parameters, inputs, outputs of a node type
 
+Examples (the projects shipped with Material Maker, to learn from and borrow from)
+  examples [words]                         list/search examples by name or node types ("wood", "voronoi")
+  show-example <name> [--graph G] [--render channel] [--size S] [-o out.png]
+  import-example <file> <example> <node> [<node> ...] [--upstream] [--graph G] [--from-graph G]
+                                           copy nodes (and with --upstream everything feeding them) into a project
+
 Automation
   batch <script.json>                      run {"ops":[{"op":"open","args":{...}}, ...]} in one session
   serve [--port N]                         JSON-lines TCP server on 127.0.0.1 (used by the MCP bridge)
@@ -85,7 +91,7 @@ func run(argv : PackedStringArray) -> int:
 	var pos : Array = []
 	var opt : Dictionary = {}
 	var i : int = 0
-	var flags : Array = ["--all", "--no-save", "-q"]
+	var flags : Array = ["--all", "--no-save", "-q", "--upstream"]
 	while i < argv.size():
 		var a : String = argv[i]
 		if a.begins_with("-") and a.length() > 1 and not a.is_valid_float():
@@ -250,6 +256,25 @@ func _dispatch(command : String, pos : Array, opt : Dictionary) -> Dictionary:
 			if opt.has("name"):
 				export_args.file_name = str(opt.name)
 			return await ops.call_op("export", export_args)
+		"examples":
+			return await ops.call_op("list_examples", { filter = " ".join(pos) })
+		"show-example":
+			if not _need(pos, 1, "show-example <name> [--graph G] [--render channel] [-o out.png]"):
+				return { error = "missing argument" }
+			var show_args : Dictionary = { name = pos[0], graph = str(opt.get("graph", "")), all_params = opt.has("all") }
+			if opt.has("render"):
+				show_args.render = parse_value(str(opt.render))
+				show_args.size = int(opt.get("size", 256))
+				show_args.out = str(opt.get("o", opt.get("out", pos[0] + "_" + str(opt.render) + ".png")))
+			return await ops.call_op("show_example", show_args)
+		"import-example":
+			if not _need(pos, 3, "import-example <file> <example> <node> [<node> ...]"):
+				return { error = "missing argument" }
+			r = await _open(pos[0])
+			if r.has("error"):
+				return r
+			r = await ops.call_op("import_from_example", { example = pos[1], nodes = pos.slice(2), with_upstream = opt.has("upstream"), graph = str(opt.get("graph", "")), from_graph = str(opt.get("from-graph", "")) })
+			return await _finish_edit(r, opt)
 		"batch":
 			if not _need(pos, 1, "batch <script.json>"):
 				return { error = "missing argument" }
