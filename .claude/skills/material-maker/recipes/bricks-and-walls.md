@@ -34,3 +34,9 @@ brick wall edited by hand (renders checked).
 
 ## Depth
 Bricks high, mortar low in the height map; invert before `depth`. Cracks and chips subtract from the height (multiply).
+
+## Community medians (34 brick materials)
+`bricks`: rows 6, columns 4, row_offset 0.5, mortar 0.01 (p75 0.1), bevel 0.1, round 0.14, corner 0.3. Normal map is `normal_map2` in half of them,
+depth goes through `invert` in 44% (a `colorize` in another 22%). AO usually from `occlusion2`/`hbao`. They typically add `warp` (53%) with
+amount ~0.07 and `fbm2` (74%) for stains. References (CC0): 489 Ancient Bricks, 1933 Genshin Impact_Brick_01, 744 Stylized cobblestone,
+438 Damaged Plaster Wall, 629 Hand Painted Style Bricks.

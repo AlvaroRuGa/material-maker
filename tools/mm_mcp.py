@@ -44,7 +44,12 @@ TOOLS = {
         "List the example projects shipped with Material Maker (wood, bricks, stone, metal, lava, ...). Each is a finished, "
         "working graph. Filter by words matched against example names and the node types they use, e.g. 'wood', 'voronoi warp'. "
         "Look here BEFORE building a texture from scratch.",
-        {"filter": S("Words to match against example names and node types")}, []),
+        {"filter": S("Words to match against example names and node types (with `community`: names, tags, descriptions)"),
+         "community": B("Search the community library of materialmaker.org (~1800 materials, mostly more elaborate than the bundled "
+                        "examples) instead of the bundled ones. Results are named `community:<id>`: pass that name to show_example / "
+                        "import_from_example. Downloaded on first use."),
+         "license": S("Community only: CC0 (default, free to reuse), CC-BY (credit the author), CC-BY-SA, or any"),
+         "limit": I("Community only: how many results to show (default 25)")}, []),
     "show_example": ("show_example",
         "Show an example's graph: nodes with their parameter values, connections, and which node feeds each Material channel. "
         "Pass `render` (a channel such as 'albedo', or a node name via `node`) to also see what it looks like. Subgraph nodes "

@@ -67,6 +67,19 @@ class CliTest(unittest.TestCase):
         self.assertIn("perlin_0:0 -> warp_0:0", cli("info", project)["connections"])
 
 
+    def test_5_community(self):
+        found = cli("examples", "--community", "--limit", "3", "planks")
+        if "error" in found:
+            self.skipTest("materialmaker.org not reachable: %s" % found["error"])
+        self.assertTrue(found["examples"])
+        name = found["examples"][0]["name"]
+        self.assertTrue(name.startswith("community:"))
+        self.assertEqual(found["examples"][0]["license"], "CC0")
+        shown = cli("show-example", name)
+        self.assertIn("author", shown["attribution"])
+        self.assertTrue(shown["nodes"])
+
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

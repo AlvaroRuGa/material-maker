@@ -66,6 +66,10 @@ def categories_of(name):
 def expr(name, nodes, incoming, depth):
     """Upstream expression of a node, e.g. colorize(blend(perlin,warp(perlin,perlin)))."""
     t = node_type(nodes[name])
+    if t == "reroute":   # reroute nodes only tidy the layout: look through them
+        src = incoming.get(name, [])
+        if src and src[0][1] in nodes:
+            return expr(src[0][1], nodes, incoming, depth)
     if depth == 0:
         return t
     sources = incoming.get(name, [])

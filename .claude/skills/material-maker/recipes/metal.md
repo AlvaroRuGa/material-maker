@@ -23,3 +23,8 @@ Three `perlin` nodes (scale 4, iterations 8, persistence 0.7 / 0.8 / 0.9 - diffe
 ## Notes
 - Clean metals: `metallic` uniform near 1, roughness 0.2-0.5 with fine scratches (high-scale stretched noise).
 - Put dirt/rust in recesses by using the inverted height as the mask for the wear layer.
+
+## Community medians (43 metal materials)
+Normal map strength is often low (median 0.25, p75 1) so grain does not become noise. `fbm2` scale ~5, `perlin` iterations 6, `warp` amount ~0.1.
+Albedo is a `blend` stack (20%), `colorize` (18%) or a subgraph. References (CC0): 616 Sci-fi Wall, 1251 Random Grunges #1 - Rust / Leaky,
+1202 Rivetted, 529 Rusty Gears, 219 Rusty Drip Marks, 1899 Metal Container.

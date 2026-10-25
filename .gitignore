@@ -26,3 +26,6 @@ build/
 .godot/
 *.orig
 *.rej
+
+# Local cache of downloaded community materials (tools/fetch_community.py)
+tools/.cache/

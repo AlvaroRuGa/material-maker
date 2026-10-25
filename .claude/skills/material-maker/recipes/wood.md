@@ -31,6 +31,8 @@ Wobble amount 0.15 looks flame-like; 0.09-0.11 is calmer.
 Two `noise_anisotropic` nodes stretched along the grain, multiplied together, through an oak-brown `colorize`; planks from `bricks2`
 (2 columns, 6 rows, row_offset 0.37 for staggered boards). Gave convincing horizontal boards with little effort, but identical grain on
 every board unless you add the per-plank `decompose` -> `transform` offset above.
+Community data agrees: `noise_anisotropic` in wood materials has median scale_x 4 and scale_y ~220 (interpolation 1, smoothness 1-2.5);
+`perlin` for wood fibres has scale_x 19-32 and scale_y from 1 to 32. Wood materials use `warp` amount 0.02-0.18 (median 0.08).
 Axes: for horizontal streaks use a LOW `scale_x` and a HIGH `scale_y` on `noise_anisotropic` (found by trial in a test); for vertical grain the
 reverse. Set `repeat` on the `transform` that offsets each plank, otherwise the shifted noise leaves seams and stops tiling.
 
@@ -40,3 +42,7 @@ fbm/perlin outputs sit near 0.5, so a gradient spanning 0-1 gives low contrast. 
 
 ## Colors that worked
 Dark #5e3517, mid #a8703a, light #e0b078 (oak-like). Darker/redder for mahogany, grayer for weathered wood.
+
+## Community references (CC0; `show_example name=community:<id> render=albedo`)
+96 Stylized Planks (hand-painted look, dark gaps, wood speckle), 129 Stylized Wooden Planks, 72 Grunge_WoodFibers, 40 Ornamental ceiling,
+1676 Hexagonal planks. Search more with `list_examples community=true filter="wood"`.

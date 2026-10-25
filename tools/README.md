@@ -144,6 +144,13 @@ python tools/mm.py show-example wood --render albedo -o wood.png     # graph, pa
 python tools/mm.py import-example my.ptex wood colorize_2 --upstream # copy a node and everything feeding it into a project
 ```
 
+**Community library.** `list_examples community=true` (CLI: `examples --community wood`) searches the ~1,800 materials of
+materialmaker.org (default: CC0 only; `--license CC-BY|any`). They are named `community:<id>` and work with `show-example` and
+`import-example`; results carry the author and licence (`attribution`). They are read from `tools/.cache/community/` if you downloaded
+them with `python tools/fetch_community.py` (all CC0 assets, ~45 MB, throttled, resumable, git-ignored), otherwise fetched on demand into
+the user data folder. `python tools/mine_community.py` turns that cache into `community_stats.md` for the skill (aggregated statistics only).
+Respect the licences: CC-BY needs credit to the author.
+
 MCP tools: `list_examples`, `show_example` (returns the render as an image), `import_from_example` (undoable in live mode).
 The example's Material node is never copied; connect the imported nodes to your own Material. Inputs that were fed from nodes you did not
 copy are returned in `open_inputs`.

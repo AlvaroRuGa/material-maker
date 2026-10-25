@@ -899,9 +899,85 @@ func _example_names() -> Array:
 	names.sort()
 	return names
 
+const SITE : String = "https://www.materialmaker.org"
+
+var _community_list : Array = []
+var _community_meta : Dictionary = {}   # id -> metadata of community assets seen so far (author, license...)
+
+func _http_get(url : String) -> String:
+	var http : HTTPRequest = HTTPRequest.new()
+	add_child(http)
+	http.timeout = 30.0
+	var status : Error = http.request(url, ["User-Agent: material-maker-cli"])
+	if status != OK:
+		http.queue_free()
+		return ""
+	var result : Array = await http.request_completed
+	http.queue_free()
+	if result[0] != HTTPRequest.RESULT_SUCCESS or result[1] != 200:
+		return ""
+	return result[3].get_string_from_utf8()
+
+func _community_cache_dirs() -> Array:
+	return [ProjectSettings.globalize_path("res://tools/.cache/community"), "user://community"]
+
+func _get_community_list() -> Array:
+	if not _community_list.is_empty():
+		return _community_list
+	for d in _community_cache_dirs():
+		var f : FileAccess = FileAccess.open(d.path_join("list.json"), FileAccess.READ)
+		if f != null:
+			var parsed = JSON.parse_string(f.get_as_text())
+			if parsed is Array:
+				_community_list = parsed
+				break
+	if _community_list.is_empty():
+		var text : String = await _http_get(SITE + "/api/getMaterials")
+		var parsed = JSON.parse_string(text)
+		if parsed is Array:
+			_community_list = parsed
+			DirAccess.make_dir_recursive_absolute("user://community")
+			var out : FileAccess = FileAccess.open("user://community/list.json", FileAccess.WRITE)
+			if out != null:
+				out.store_string(text)
+	for a in _community_list:
+		_community_meta[str(int(a.get("id", 0)))] = a   # JSON numbers arrive as floats
+	return _community_list
+
+func _attribution(example_name : String) -> Dictionary:
+	if not example_name.begins_with("community:"):
+		return {}
+	var m : Dictionary = _community_meta.get(example_name.substr(10), {})
+	return { name = m.get("name", ""), author = m.get("author", ""), license = m.get("license", ""), source = SITE + "/materials" } if not m.is_empty() else {}
+
+# "name" is an example shipped with Material Maker, or "community:<id>" for a material of
+# materialmaker.org (read from a local cache, else downloaded once into user://community)
 func _load_example(example_name : String) -> Dictionary:
 	if _example_cache.has(example_name):
 		return _example_cache[example_name]
+	if example_name.begins_with("community:"):
+		var id : String = example_name.substr(10)
+		if not id.is_valid_int():
+			return {}
+		await _get_community_list()
+		var text : String = ""
+		for d in _community_cache_dirs():
+			var f : FileAccess = FileAccess.open(d.path_join(id + ".ptex"), FileAccess.READ)
+			if f != null:
+				text = f.get_as_text()
+				break
+		if text == "":
+			var payload = JSON.parse_string(await _http_get(SITE + "/api/getMaterial?id=" + id))
+			if payload is Dictionary and payload.has("json"):
+				text = str(payload.json)
+				DirAccess.make_dir_recursive_absolute("user://community")
+				var out : FileAccess = FileAccess.open("user://community/%s.ptex" % id, FileAccess.WRITE)
+				if out != null:
+					out.store_string(text)
+		var data : Dictionary = mm_loader.string_to_dict_tree(text) if text != "" else {}
+		if not data.is_empty():
+			_example_cache[example_name] = data
+		return data
 	for d in _example_dirs():
 		var file_path : String = d.path_join(example_name + ".ptex")
 		if FileAccess.file_exists(file_path):
@@ -951,8 +1027,29 @@ func op_list_examples(args : Dictionary) -> Dictionary:
 	var filter : String = str(args.get("filter", "")).to_lower()
 	var query_words : Array = filter.split(" ", false)
 	var rv : Array = []
+	if bool(args.get("community", false)):
+		var assets : Array = await _get_community_list()
+		if assets.is_empty():
+			return _err("Cannot reach materialmaker.org (no internet, or the site is down)")
+		var wanted_license : String = str(args.get("license", "CC0"))
+		var limit : int = int(args.get("limit", 25))
+		var total : int = 0
+		for a in assets:
+			if int(a.get("type", 0)) != 0 or (wanted_license != "any" and str(a.get("license", "")) != wanted_license):
+				continue
+			var text : String = ("%s %s %s" % [a.get("name", ""), a.get("tags", ""), a.get("description", "")]).to_lower()
+			var ok : bool = true
+			for w in query_words:
+				if w not in text:
+					ok = false
+			if not ok:
+				continue
+			total += 1
+			if rv.size() < limit:
+				rv.append({ name = "community:" + str(int(a.id)), title = a.get("name", ""), author = a.get("author", ""), license = a.get("license", ""), tags = a.get("tags", ""), description = a.get("description", "") })
+		return { count = total, shown = rv.size(), licenses = wanted_license, examples = rv, note = "Use name with show_example/import_from_example. CC-BY needs credit to the author if you reuse it." }
 	for example_name in _example_names():
-		var data : Dictionary = _load_example(example_name)
+		var data : Dictionary = await _load_example(example_name)
 		var counts : Dictionary = {}
 		for n in data.get("nodes", []):
 			var t : String = _raw_type(n)
@@ -972,7 +1069,7 @@ func op_list_examples(args : Dictionary) -> Dictionary:
 
 func op_show_example(args : Dictionary) -> Dictionary:
 	var example_name : String = str(args.get("name", ""))
-	var data : Dictionary = _load_example(example_name)
+	var data : Dictionary = await _load_example(example_name)
 	if data.is_empty():
 		var close : Array = _example_names().filter(func(n): return example_name != "" and (example_name in n or n in example_name))
 		return _err("Unknown example '%s'" % example_name, { suggestions = close.slice(0, 8), hint = "use list_examples" })
@@ -1001,6 +1098,9 @@ func op_show_example(args : Dictionary) -> Dictionary:
 	for c in g.get("connections", []):
 		conns.append("%s:%d -> %s:%d" % [c.from, c.from_port, c.to, c.to_port])
 	var rv : Dictionary = { name = example_name, graph = graph_path, nodes = nodes, connections = conns, material_channels = _channel_sources(g) }
+	var credit : Dictionary = _attribution(example_name)
+	if not credit.is_empty():
+		rv.attribution = credit
 	if args.has("render") or args.has("out"):
 		var gen = await mm_loader.create_gen(data.duplicate(true))
 		if gen == null:
@@ -1023,7 +1123,7 @@ func op_import_from_example(args : Dictionary) -> Dictionary:
 	if not _has_project():
 		return _err("No project is open (use new_project or open)")
 	var example_name : String = str(args.get("example", ""))
-	var data : Dictionary = _load_example(example_name)
+	var data : Dictionary = await _load_example(example_name)
 	if data.is_empty():
 		return _err("Unknown example '%s' (use list_examples)" % example_name)
 	var src : Dictionary = _example_graph(data, str(args.get("from_graph", "")))
@@ -1091,7 +1191,13 @@ func op_import_from_example(args : Dictionary) -> Dictionary:
 	for g in created:
 		mapping[str(g.orig_name) if g.orig_name != null else str(g.name)] = str(g.name)
 	dirty = true
-	return { ok = true, imported = mapping, connections = conn_data.size(), open_inputs = open_inputs }
+	var rv : Dictionary = { ok = true, imported = mapping, connections = conn_data.size(), open_inputs = open_inputs }
+	var credit : Dictionary = _attribution(example_name)
+	if not credit.is_empty():
+		rv.attribution = credit
+		if str(credit.license) != "CC0":
+			rv.attribution_required = "Licensed %s: credit '%s' by %s if you publish this." % [credit.license, credit.name, credit.author]
+	return rv
 
 func op_batch(args : Dictionary) -> Dictionary:
 	var results : Array = []

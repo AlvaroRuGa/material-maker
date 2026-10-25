@@ -38,7 +38,9 @@ Discovery
   type-info <type>                         parameters, inputs, outputs of a node type
 
 Examples (the projects shipped with Material Maker, to learn from and borrow from)
-  examples [words]                         list/search examples by name or node types ("wood", "voronoi")
+  examples [words] [--community [--license CC0|CC-BY|any] [--limit N]]
+                                           list/search examples by name or node types ("wood", "voronoi");
+                                           --community searches the ~1800 materials of materialmaker.org (names: community:<id>)
   show-example <name> [--graph G] [--render channel] [--size S] [-o out.png]
   import-example <file> <example> <node> [<node> ...] [--upstream] [--graph G] [--from-graph G]
                                            copy nodes (and with --upstream everything feeding them) into a project
@@ -91,7 +93,7 @@ func run(argv : PackedStringArray) -> int:
 	var pos : Array = []
 	var opt : Dictionary = {}
 	var i : int = 0
-	var flags : Array = ["--all", "--no-save", "-q", "--upstream"]
+	var flags : Array = ["--all", "--no-save", "-q", "--upstream", "--community"]
 	while i < argv.size():
 		var a : String = argv[i]
 		if a.begins_with("-") and a.length() > 1 and not a.is_valid_float():
@@ -257,7 +259,7 @@ func _dispatch(command : String, pos : Array, opt : Dictionary) -> Dictionary:
 				export_args.file_name = str(opt.name)
 			return await ops.call_op("export", export_args)
 		"examples":
-			return await ops.call_op("list_examples", { filter = " ".join(pos) })
+			return await ops.call_op("list_examples", { filter = " ".join(pos), community = opt.has("community"), license = str(opt.get("license", "CC0")), limit = int(opt.get("limit", 25)) })
 		"show-example":
 			if not _need(pos, 1, "show-example <name> [--graph G] [--render channel] [-o out.png]"):
 				return { error = "missing argument" }
