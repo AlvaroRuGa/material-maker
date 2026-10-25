@@ -30,6 +30,13 @@ export MM_EXE=/path/to/MaterialMaker                          # exported build, 
 
 (On Windows the `_console.exe` variant of Godot is picked automatically if it sits next to the exe.)
 
+## No windows pop up
+
+Rendering needs a GPU context, so Godot always creates a (tiny) window, even headless. On Windows the tools therefore start it on a private,
+invisible desktop: nothing appears on screen, in the taskbar or the tray, and focus is never stolen. The process is tied to the launcher, so it
+cannot be left behind if the launcher crashes. Set `MM_SHOW_WINDOW=1` to see the window again (debugging). On other systems the process is started
+in the background; Linux/macOS may still show a window briefly. The live editor (`mm.py gui`, `open_editor`) is a normal visible window.
+
 ## CLI
 
 ```sh

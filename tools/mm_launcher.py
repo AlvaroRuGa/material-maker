@@ -5,16 +5,21 @@ Finding the program, in order:
   MM_GODOT  path of a Godot 4.7 binary, run against this source tree (godot --path <repo> ...)
   GODOT     same as MM_GODOT
   godot / godot4 found on PATH
+
+Headless runs still need a window for the GPU, so on Windows they are started on a private, invisible desktop:
+nothing appears on screen, in the taskbar or in the tray, and no focus is stolen. Set MM_SHOW_WINDOW=1 to disable that
+(useful for debugging). On other systems the process is simply started in the background.
 """
+import atexit
 import json
 import os
 import shutil
 import socket
 import subprocess
 import sys
+import tempfile
 import threading
 import time
-from collections import deque
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULT_MARKER = "@@MM_RESULT@@ "
@@ -61,6 +66,166 @@ def _env(cwd):
     return env
 
 
+# --- starting processes without any visible window -------------------------------------------------
+
+_desktop = None
+
+
+def _hidden_desktop():
+    """(name, handle) of a private desktop (Windows), created once per process; None if unavailable."""
+    global _desktop
+    if _desktop is None:
+        import ctypes
+        import ctypes.wintypes as wt
+        user32 = ctypes.WinDLL("user32", use_last_error=True)
+        user32.CreateDesktopW.restype = wt.HANDLE
+        user32.CreateDesktopW.argtypes = [wt.LPCWSTR, wt.LPCWSTR, ctypes.c_void_p, wt.DWORD, wt.DWORD, ctypes.c_void_p]
+        name = "mm_hidden_%d" % os.getpid()
+        handle = user32.CreateDesktopW(name, None, None, 0, 0x10000000, None)   # GENERIC_ALL
+        _desktop = (name, handle) if handle else False
+        if handle:
+            atexit.register(lambda: user32.CloseDesktop(handle))
+    return _desktop or None
+
+
+_job = None
+
+
+def _kill_on_exit_job():
+    """A job object that kills its processes when this launcher exits (even if it crashes), so a Material Maker running on
+    the invisible desktop can never be left behind unnoticed."""
+    global _job
+    if _job is None:
+        import ctypes
+        import ctypes.wintypes as wt
+        k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+
+        class BASIC(ctypes.Structure):
+            _fields_ = [("PerProcessUserTimeLimit", ctypes.c_int64), ("PerJobUserTimeLimit", ctypes.c_int64), ("LimitFlags", wt.DWORD),
+                        ("MinimumWorkingSetSize", ctypes.c_size_t), ("MaximumWorkingSetSize", ctypes.c_size_t),
+                        ("ActiveProcessLimit", wt.DWORD), ("Affinity", ctypes.c_size_t), ("PriorityClass", wt.DWORD),
+                        ("SchedulingClass", wt.DWORD)]
+
+        class EXTENDED(ctypes.Structure):
+            _fields_ = [("Basic", BASIC), ("IoInfo", ctypes.c_uint64 * 6), ("ProcessMemoryLimit", ctypes.c_size_t),
+                        ("JobMemoryLimit", ctypes.c_size_t), ("PeakProcessMemoryUsed", ctypes.c_size_t),
+                        ("PeakJobMemoryUsed", ctypes.c_size_t)]
+
+        k32.CreateJobObjectW.restype = wt.HANDLE
+        k32.CreateJobObjectW.argtypes = [ctypes.c_void_p, wt.LPCWSTR]
+        k32.SetInformationJobObject.argtypes = [wt.HANDLE, ctypes.c_int, ctypes.c_void_p, wt.DWORD]
+        job = k32.CreateJobObjectW(None, None)
+        info = EXTENDED()
+        info.Basic.LimitFlags = 0x2000   # JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
+        ok = job and k32.SetInformationJobObject(job, 9, ctypes.byref(info), ctypes.sizeof(info))
+        _job = job if ok else False
+    return _job or None
+
+
+class _HiddenProc:
+    """Popen-like handle (poll / wait / kill / pid) for a process created on the hidden desktop."""
+
+    def __init__(self, handle, pid):
+        import ctypes
+        self._k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        self._handle = handle
+        self.pid = pid
+
+    def poll(self):
+        import ctypes
+        import ctypes.wintypes as wt
+        code = wt.DWORD()
+        self._k32.GetExitCodeProcess(self._handle, ctypes.byref(code))
+        return None if code.value == 259 else code.value   # 259 = STILL_ACTIVE
+
+    def wait(self, timeout=None):
+        status = self._k32.WaitForSingleObject(self._handle, 0xFFFFFFFF if timeout is None else int(timeout * 1000))
+        if status == 258:   # WAIT_TIMEOUT
+            raise subprocess.TimeoutExpired("material-maker", timeout)
+        return self.poll()
+
+    def kill(self):
+        self._k32.TerminateProcess(self._handle, 1)
+
+
+def _spawn_hidden_windows(argv, env, cwd, log_file):
+    import ctypes
+    import ctypes.wintypes as wt
+    import msvcrt
+    desktop = _hidden_desktop()
+    if desktop is None:
+        return None
+
+    class STARTUPINFOW(ctypes.Structure):
+        _fields_ = [("cb", wt.DWORD), ("lpReserved", wt.LPWSTR), ("lpDesktop", wt.LPWSTR), ("lpTitle", wt.LPWSTR),
+                    ("dwX", wt.DWORD), ("dwY", wt.DWORD), ("dwXSize", wt.DWORD), ("dwYSize", wt.DWORD),
+                    ("dwXCountChars", wt.DWORD), ("dwYCountChars", wt.DWORD), ("dwFillAttribute", wt.DWORD),
+                    ("dwFlags", wt.DWORD), ("wShowWindow", wt.WORD), ("cbReserved2", wt.WORD), ("lpReserved2", ctypes.c_void_p),
+                    ("hStdInput", wt.HANDLE), ("hStdOutput", wt.HANDLE), ("hStdError", wt.HANDLE)]
+
+    class PROCESS_INFORMATION(ctypes.Structure):
+        _fields_ = [("hProcess", wt.HANDLE), ("hThread", wt.HANDLE), ("dwProcessId", wt.DWORD), ("dwThreadId", wt.DWORD)]
+
+    k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    k32.CreateProcessW.argtypes = [wt.LPCWSTR, wt.LPWSTR, ctypes.c_void_p, ctypes.c_void_p, wt.BOOL, wt.DWORD, ctypes.c_void_p,
+                                   wt.LPCWSTR, ctypes.POINTER(STARTUPINFOW), ctypes.POINTER(PROCESS_INFORMATION)]
+    nul = open(os.devnull, "rb")
+    handles = [msvcrt.get_osfhandle(nul.fileno()), msvcrt.get_osfhandle(log_file.fileno())]
+    for h in handles:
+        os.set_handle_inheritable(h, True)
+    si = STARTUPINFOW()
+    si.cb = ctypes.sizeof(si)
+    si.lpDesktop = desktop[0]
+    si.dwFlags = 0x100   # STARTF_USESTDHANDLES
+    si.hStdInput, si.hStdOutput, si.hStdError = handles[0], handles[1], handles[1]
+    pi = PROCESS_INFORMATION()
+    cmd = subprocess.list2cmdline(argv)
+    block = ctypes.create_unicode_buffer("".join("%s=%s\0" % kv for kv in env.items()) + "\0")
+    ok = k32.CreateProcessW(None, ctypes.create_unicode_buffer(cmd), None, None, True, 0x400, ctypes.cast(block, ctypes.c_void_p),
+                            cwd, ctypes.byref(si), ctypes.byref(pi))
+    nul.close()
+    if not ok:
+        return None
+    k32.CloseHandle(pi.hThread)
+    job = _kill_on_exit_job()
+    if job:
+        k32.AssignProcessToJobObject.argtypes = [wt.HANDLE, wt.HANDLE]
+        k32.AssignProcessToJobObject(job, pi.hProcess)
+    return _HiddenProc(pi.hProcess, pi.dwProcessId)
+
+
+def spawn(argv, env):
+    """Start a headless Material Maker process whose output goes to a log file. Returns (process, log_path).
+
+    The process object has poll(), wait(timeout), kill() and pid."""
+    fd, log_path = tempfile.mkstemp(prefix="mm_log_", suffix=".txt")
+    log_file = os.fdopen(fd, "wb")
+    proc = None
+    try:
+        if sys.platform == "win32" and not os.environ.get("MM_SHOW_WINDOW"):
+            proc = _spawn_hidden_windows(argv, env, REPO, log_file)
+        if proc is None:
+            proc = subprocess.Popen(argv, stdout=log_file, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, env=env)
+    finally:
+        log_file.close()
+    return proc, log_path
+
+
+def read_log(log_path):
+    try:
+        with open(log_path, "r", encoding="utf-8", errors="replace") as f:
+            return f.read()
+    except OSError:
+        return ""
+
+
+def remove_log(log_path):
+    try:
+        os.remove(log_path)
+    except OSError:
+        pass
+
+
 DEFAULT_LIVE_PORT = 8765
 
 
@@ -99,14 +264,17 @@ def start_gui(port=DEFAULT_LIVE_PORT, files=()):
 def run_cli(args, cwd=None, timeout=600):
     """Run one `--cli` command. Returns (result_dict, log_text)."""
     argv = command_prefix() + ["--cli"] + list(args)
+    proc, log_path = spawn(argv, _env(cwd))
     try:
-        proc = subprocess.run(argv, capture_output=True, text=True, encoding="utf-8", errors="replace",
-                              env=_env(cwd), timeout=timeout)
+        proc.wait(timeout=timeout)
     except subprocess.TimeoutExpired:
+        proc.kill()
+        remove_log(log_path)
         raise LauncherError("Material Maker timed out after %ds" % timeout)
-    log = (proc.stdout or "") + (proc.stderr or "")
+    log = read_log(log_path)
+    remove_log(log_path)
     result = None
-    for line in (proc.stdout or "").splitlines():
+    for line in log.splitlines():
         if line.startswith(RESULT_MARKER):
             result = json.loads(line[len(RESULT_MARKER):])
     return result, log
@@ -130,9 +298,9 @@ class Server:
         self.live_port = live_port  # attach to a running editor (--live-server) instead of starting one
         self.startup_timeout = startup_timeout
         self.proc = None
+        self.log_path = None
         self.sock = None
         self.buffer = b""
-        self.log = deque(maxlen=400)
         self.next_id = 1
         self.lock = threading.Lock()
 
@@ -141,12 +309,8 @@ class Server:
             s.bind(("127.0.0.1", 0))
             return s.getsockname()[1]
 
-    def _drain(self, stream, ready):
-        for line in stream:
-            line = line.rstrip("\r\n")
-            self.log.append(line)
-            if line.startswith(READY_MARKER):
-                ready.set()
+    def _log_text(self):
+        return read_log(self.log_path) if self.log_path else ""
 
     def start(self):
         if self.live_port:
@@ -160,18 +324,17 @@ class Server:
             return
         port = self._free_port()
         argv = command_prefix() + ["--cli", "serve", "--port", str(port)]
-        self.proc = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
-                                     encoding="utf-8", errors="replace", env=_env(self.cwd))
-        ready = threading.Event()
-        threading.Thread(target=self._drain, args=(self.proc.stdout, ready), daemon=True).start()
+        self.proc, self.log_path = spawn(argv, _env(self.cwd))
         deadline = time.time() + self.startup_timeout
-        while not ready.is_set():
+        while READY_MARKER not in self._log_text():
             if self.proc.poll() is not None:
-                raise LauncherError("Material Maker exited during startup:\n" + interesting_log("\n".join(self.log)))
+                text = interesting_log(self._log_text())
+                self.stop()
+                raise LauncherError("Material Maker exited during startup:\n" + text)
             if time.time() > deadline:
                 self.stop()
                 raise LauncherError("Material Maker did not start within %ds" % self.startup_timeout)
-            time.sleep(0.05)
+            time.sleep(0.1)
         self.sock = socket.create_connection(("127.0.0.1", port), timeout=10)
         self.sock.settimeout(None)
 
@@ -193,7 +356,7 @@ class Server:
                 while b"\n" not in self.buffer:
                     chunk = self.sock.recv(65536)
                     if not chunk:
-                        raise LauncherError("Material Maker closed the connection:\n" + interesting_log("\n".join(self.log)))
+                        raise LauncherError("Material Maker closed the connection:\n" + interesting_log(self._log_text()))
                     self.buffer += chunk
             except socket.timeout:
                 raise LauncherError("Operation '%s' timed out after %ds" % (op, timeout))
@@ -216,8 +379,9 @@ class Server:
                 self.proc.wait(timeout=5)
             except subprocess.TimeoutExpired:
                 self.proc.kill()
-            if self.proc.stdout is not None:
-                self.proc.stdout.close()
+        if self.log_path:
+            remove_log(self.log_path)
+            self.log_path = None
         if self.sock is not None:
             self.sock.close()
         self.proc = None
